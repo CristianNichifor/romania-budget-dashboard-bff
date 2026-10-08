@@ -9,7 +9,7 @@ Convenții pentru `romania-budget-dashboard-bff` (aliniate cu hack-for-facts-eb-
 - `pnpm test` — vitest (unit core + integration via `app.inject`)
 - `pnpm smoke:live` — smoke test împotriva API-ului public transparenta.eu
 - `pnpm worker:dev` — Cloudflare Worker local (Hono, aceleași surse; port 8787)
-- `pnpm worker:deploy` — deploy Worker pe Cloudflare (https://api.buget.cristian-nichifor.com)
+- `pnpm worker:deploy` — deploy Worker pe Cloudflare (https://budget.cristian-nichifor.com/api/...)
 - Deploy: `cp .env.example .env && docker compose up -d --build` (stack BFF+frontend, sibling repo). CI publică imaginea pe GHCR la push pe `main`/tag-uri `v*`; smoke-ul live rulează săptămânal/manual.
 
 ## Reguli

@@ -156,12 +156,13 @@ Același nucleu (surse, mapping, Decimal) rulează ca Worker pe Cloudflare — `
 
 ```bash
 pnpm worker:dev      # local: http://localhost:8787
-pnpm worker:deploy   # https://api.buget.cristian-nichifor.com
+pnpm worker:deploy   # https://budget.cristian-nichifor.com/api/...
 ```
 
+- API-ul răspunde la `https://budget.cristian-nichifor.com/api/...`, pe aceeași origine cu dashboard-ul: o rută Workers `budget.cristian-nichifor.com/api/*` în contul Cloudflare CN Webify Customers, legată de Terraform (`wrangler.toml` nu are `routes`). `/health/*` rămâne doar local/Docker.
 - Config în `wrangler.toml`: `DATA_SOURCE` (`hackforfacts` live / `static` demo), URL-ul și timeout-urile upstream — editabile și din dashboard-ul Cloudflare.
 - Free tier Workers: 100k invocări/zi (fiecare pagină face ~6 apeluri → ~16k pagini/zi).
-- CI: `.github/workflows/deploy-worker.yml` — deploy la push pe `main` (necesită secretele `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID`).
+- CI: `.github/workflows/deploy-worker.yml` — deploy la push pe `main` (necesită secretele `CLOUDFLARE_API_TOKEN` — token de cont Customers, _Workers Scripts Write_ — + `CLOUDFLARE_ACCOUNT_ID`).
 
 ## Git workflow
 
