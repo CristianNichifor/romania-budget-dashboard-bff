@@ -66,7 +66,7 @@ pnpm test
 ```
 
 The generator uses static data and refuses network access. Review its diff, copy
-the JSON to `ro-budget-dashboard/tests/fixtures/api-contract.json`, run that
+the JSON to `romania-budget-dashboard/tests/fixtures/api-contract.json`, run that
 repo's checks and link the paired PR. Do not hand-wave schema compatibility or
 refresh fixtures from production. Monetary strings must never pass through
 JavaScript numbers. Preserve the Functional Core / Imperative Shell split:

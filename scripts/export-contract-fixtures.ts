@@ -2,7 +2,7 @@ import { writeFile } from "node:fs/promises";
 import { buildApp } from "../src/app/build-app";
 import { loadConfig } from "../src/infra/config";
 
-// DEMO NOTE: versioned static API examples shared with ro-budget-dashboard.
+// DEMO NOTE: versioned static API examples shared with romania-budget-dashboard.
 const paths = [
   "/api/budget/summary?year=2026",
   "/api/budget/destinations?year=2026",
