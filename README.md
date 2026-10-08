@@ -1,8 +1,8 @@
-# ro-budget-dashboard-bff
+# romania-budget-dashboard-bff
 
 Contributor setup and checks: [CONTRIBUTING.md](CONTRIBUTING.md).
 
-Backend-for-frontend pentru [ro-budget-dashboard](https://github.com/CristianNichifor/ro-budget-dashboard): agreghează datele bugetare (Open Budget 2026 / hack-for-facts-eb-server) cu context INS și Eurostat/BCE, într-un contract tipizat consumat de frontend.
+Backend-for-frontend pentru [romania-budget-dashboard](https://github.com/CristianNichifor/romania-budget-dashboard): agreghează datele bugetare (Open Budget 2026 / hack-for-facts-eb-server) cu context INS și Eurostat/BCE, într-un contract tipizat consumat de frontend.
 
 > **Status: P36.** Sursa implicită este `static` (seed-uri demo). Sursa `hackforfacts` servește datele live din API-ul public transparenta.eu (`https://api.transparenta.eu/graphql`) — vezi „Surse de date”. Module live: buget adoptat (MFP/data.gov.ro), macro extins (Eurostat/BCE), wages (context, estimare lunară, salariu real), context (trend sănătate COFOG), society, INS (Eurostat), energy și labour. Fiecare răspuns include `sourceUpdated` (data ultimei revizii Eurostat).
 
@@ -142,8 +142,8 @@ docker compose up -d --build   # http://localhost:8080
 sau doar BFF-ul:
 
 ```bash
-docker build -t ro-budget-dashboard-bff .
-docker run -p 3000:3000 --env-file .env ro-budget-dashboard-bff
+docker build -t romania-budget-dashboard-bff .
+docker run -p 3000:3000 --env-file .env romania-budget-dashboard-bff
 ```
 
 Imaginea de runtime conține doar dependențele de producție + `dist/` (entrypoint `node dist/api.js`).

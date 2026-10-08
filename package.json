@@ -1,5 +1,5 @@
 {
-  "name": "ro-budget-dashboard-bff",
+  "name": "romania-budget-dashboard-bff",
   "version": "0.1.0",
   "description": "BFF for the Romanian citizen budget dashboard — aggregates budget (Open Budget), Eurostat, ECB and INS context",
   "private": true,

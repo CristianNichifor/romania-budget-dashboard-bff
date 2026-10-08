@@ -1,5 +1,5 @@
 # Full stack: BFF + frontend.
-# The frontend lives in the sibling repo (../ro-budget-dashboard).
+# The frontend lives in the sibling repo (../romania-budget-dashboard).
 #
 # Usage:
 #   cp .env.example .env      # then adjust as needed (e.g. DATA_SOURCE=hackforfacts)
@@ -12,7 +12,7 @@
 services:
   bff:
     build: .
-    image: ro-budget-dashboard-bff:latest
+    image: romania-budget-dashboard-bff:latest
     env_file: .env
     ports:
       - "3000:3000"
@@ -26,10 +26,10 @@ services:
 
   frontend:
     build:
-      context: ../ro-budget-dashboard
+      context: ../romania-budget-dashboard
       args:
         VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:3000}
-    image: ro-budget-dashboard:latest
+    image: romania-budget-dashboard:latest
     ports:
       - "8080:80"
     depends_on:

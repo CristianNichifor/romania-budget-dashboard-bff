@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Convenții pentru `ro-budget-dashboard-bff` (aliniate cu hack-for-facts-eb-server).
+Convenții pentru `romania-budget-dashboard-bff` (aliniate cu hack-for-facts-eb-server).
 
 ## Comenzi
 
