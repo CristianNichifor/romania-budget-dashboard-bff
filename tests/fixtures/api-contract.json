@@ -1,0 +1,405 @@
+{
+  "/api/budget/summary?year=2026": {
+    "year": 2026,
+    "revenue": "728990724000",
+    "expenditure": "864675193000",
+    "deficit": "135684469000",
+    "deficitPercentGdp": "7.1"
+  },
+  "/api/budget/destinations?year=2026": [
+    {
+      "id": "pensii",
+      "name": "Pensii",
+      "amount": "217814450000",
+      "percentOfTotal": "25.2",
+      "subDestinations": [
+        {
+          "id": "pensii-contributive",
+          "name": "Pensii contributive",
+          "amount": "154755000000"
+        },
+        {
+          "id": "pensii-speciale",
+          "name": "Pensii speciale",
+          "amount": "18710547184"
+        },
+        {
+          "id": "pensii-minime",
+          "name": "Pensii minime",
+          "amount": "18664373816"
+        },
+        {
+          "id": "pensii-urmas",
+          "name": "Pensii de urmaș",
+          "amount": "1885000000"
+        }
+      ]
+    },
+    {
+      "id": "fonduri-externe",
+      "name": "Proiecte pe fonduri externe",
+      "amount": "146837970000",
+      "percentOfTotal": "17.0"
+    },
+    {
+      "id": "asistenta-sociala",
+      "name": "Asistență socială",
+      "amount": "113504154000",
+      "percentOfTotal": "13.1"
+    },
+    {
+      "id": "salarii",
+      "name": "Salarii",
+      "amount": "110091069000",
+      "percentOfTotal": "12.7"
+    },
+    {
+      "id": "datorii",
+      "name": "Datorii și angajamente",
+      "amount": "82751313000",
+      "percentOfTotal": "9.6"
+    },
+    {
+      "id": "investitii",
+      "name": "Investiții",
+      "amount": "35928663000",
+      "percentOfTotal": "4.2"
+    }
+  ],
+  "/api/budget/institutions?category=pensii&year=2026": {
+    "category": "pensii",
+    "total": "217814450000",
+    "institutions": [
+      {
+        "id": "pensii-contributive",
+        "name": "Pensii contributive",
+        "amount": "154755000000"
+      },
+      {
+        "id": "pensii-speciale",
+        "name": "Pensii speciale",
+        "amount": "18710547184"
+      },
+      {
+        "id": "pensii-minime",
+        "name": "Pensii minime",
+        "amount": "18664373816"
+      },
+      {
+        "id": "pensii-urmas",
+        "name": "Pensii de urmaș",
+        "amount": "1885000000"
+      }
+    ]
+  },
+  "/api/salary/calculate?gross=9427.13": {
+    "gross": "9427.13",
+    "cas": "2356.78",
+    "cass": "942.71",
+    "incomeTax": "612.76",
+    "employerContribution": "212.11",
+    "estimatedVat": "717.84",
+    "net": "5514.87",
+    "employerCost": "9639.24",
+    "stateShare": "4842.21",
+    "statePercent": "50.2344",
+    "entries": [
+      {
+        "labelKey": "salary.entry.gross",
+        "amount": "9639.24"
+      },
+      {
+        "labelKey": "salary.entry.employerContribution",
+        "amount": "-212.11"
+      },
+      {
+        "labelKey": "salary.entry.cas",
+        "amount": "-2356.78"
+      },
+      {
+        "labelKey": "salary.entry.cass",
+        "amount": "-942.71"
+      },
+      {
+        "labelKey": "salary.entry.incomeTax",
+        "amount": "-612.76"
+      },
+      {
+        "labelKey": "salary.entry.estimatedVat",
+        "amount": "-717.84"
+      },
+      {
+        "labelKey": "salary.entry.net",
+        "amount": "5514.87"
+      }
+    ]
+  },
+  "/api/ins/metrics?code=infant-mortality": {
+    "code": "infant-mortality",
+    "unit": "la 1.000 locuitori",
+    "label": "Mortalitate infantilă",
+    "data": [
+      {
+        "year": 2021,
+        "value": 6.1
+      },
+      {
+        "year": 2022,
+        "value": 5.9
+      },
+      {
+        "year": 2023,
+        "value": 5.7
+      },
+      {
+        "year": 2024,
+        "value": 5.5
+      },
+      {
+        "year": 2025,
+        "value": 5.4
+      },
+      {
+        "year": 2026,
+        "value": 5.2
+      }
+    ]
+  },
+  "/api/ins/catalog": {
+    "metrics": [
+      {
+        "code": "infant-mortality",
+        "label": "Mortalitate infantilă",
+        "unit": "la 1.000 locuitori"
+      },
+      {
+        "code": "pensioners",
+        "label": "Beneficiari de pensii",
+        "unit": "persoane"
+      },
+      {
+        "code": "hospital-beds",
+        "label": "Paturi de spital",
+        "unit": "mii paturi"
+      }
+    ]
+  },
+  "/api/investments/by-county": {
+    "year": 2026,
+    "total": "30080000000",
+    "counties": [
+      {
+        "county": "Alba",
+        "region": "Centru",
+        "amount": "300000000"
+      },
+      {
+        "county": "Arad",
+        "region": "Vest",
+        "amount": "600000000"
+      },
+      {
+        "county": "Argeș",
+        "region": "Sud-Muntenia",
+        "amount": "750000000"
+      },
+      {
+        "county": "Bacău",
+        "region": "Nord-Est",
+        "amount": "700000000"
+      },
+      {
+        "county": "Bihor",
+        "region": "Nord-Vest",
+        "amount": "900000000"
+      },
+      {
+        "county": "Bistrița-Năsăud",
+        "region": "Nord-Vest",
+        "amount": "420000000"
+      },
+      {
+        "county": "Botoșani",
+        "region": "Nord-Est",
+        "amount": "380000000"
+      },
+      {
+        "county": "Brașov",
+        "region": "Centru",
+        "amount": "1200000000"
+      },
+      {
+        "county": "Brăila",
+        "region": "Sud-Est",
+        "amount": "360000000"
+      },
+      {
+        "county": "Buzău",
+        "region": "Sud-Est",
+        "amount": "520000000"
+      },
+      {
+        "county": "Caraș-Severin",
+        "region": "Vest",
+        "amount": "310000000"
+      },
+      {
+        "county": "Călărași",
+        "region": "Sud-Muntenia",
+        "amount": "230000000"
+      },
+      {
+        "county": "Cluj",
+        "region": "Nord-Vest",
+        "amount": "1900000000"
+      },
+      {
+        "county": "Constanța",
+        "region": "Sud-Est",
+        "amount": "1500000000"
+      },
+      {
+        "county": "Covasna",
+        "region": "Centru",
+        "amount": "320000000"
+      },
+      {
+        "county": "Dâmbovița",
+        "region": "Sud-Muntenia",
+        "amount": "500000000"
+      },
+      {
+        "county": "Dolj",
+        "region": "Sud-Vest Oltenia",
+        "amount": "1000000000"
+      },
+      {
+        "county": "Galați",
+        "region": "Sud-Est",
+        "amount": "800000000"
+      },
+      {
+        "county": "Giurgiu",
+        "region": "Sud-Muntenia",
+        "amount": "260000000"
+      },
+      {
+        "county": "Gorj",
+        "region": "Sud-Vest Oltenia",
+        "amount": "350000000"
+      },
+      {
+        "county": "Harghita",
+        "region": "Centru",
+        "amount": "340000000"
+      },
+      {
+        "county": "Hunedoara",
+        "region": "Vest",
+        "amount": "560000000"
+      },
+      {
+        "county": "Ialomița",
+        "region": "Sud-Muntenia",
+        "amount": "290000000"
+      },
+      {
+        "county": "Iași",
+        "region": "Nord-Est",
+        "amount": "1400000000"
+      },
+      {
+        "county": "Ilfov",
+        "region": "București-Ilfov",
+        "amount": "650000000"
+      },
+      {
+        "county": "Maramureș",
+        "region": "Nord-Vest",
+        "amount": "580000000"
+      },
+      {
+        "county": "Mehedinți",
+        "region": "Sud-Vest Oltenia",
+        "amount": "240000000"
+      },
+      {
+        "county": "Mureș",
+        "region": "Centru",
+        "amount": "850000000"
+      },
+      {
+        "county": "Neamț",
+        "region": "Nord-Est",
+        "amount": "480000000"
+      },
+      {
+        "county": "Olt",
+        "region": "Sud-Vest Oltenia",
+        "amount": "460000000"
+      },
+      {
+        "county": "Prahova",
+        "region": "Sud-Muntenia",
+        "amount": "1100000000"
+      },
+      {
+        "county": "Satu Mare",
+        "region": "Nord-Vest",
+        "amount": "440000000"
+      },
+      {
+        "county": "Sălaj",
+        "region": "Nord-Vest",
+        "amount": "280000000"
+      },
+      {
+        "county": "Sibiu",
+        "region": "Centru",
+        "amount": "600000000"
+      },
+      {
+        "county": "Suceava",
+        "region": "Nord-Est",
+        "amount": "950000000"
+      },
+      {
+        "county": "Teleorman",
+        "region": "Sud-Muntenia",
+        "amount": "270000000"
+      },
+      {
+        "county": "Timiș",
+        "region": "Vest",
+        "amount": "1600000000"
+      },
+      {
+        "county": "Tulcea",
+        "region": "Sud-Est",
+        "amount": "250000000"
+      },
+      {
+        "county": "Vaslui",
+        "region": "Nord-Est",
+        "amount": "400000000"
+      },
+      {
+        "county": "Vâlcea",
+        "region": "Sud-Vest Oltenia",
+        "amount": "540000000"
+      },
+      {
+        "county": "Vrancea",
+        "region": "Sud-Est",
+        "amount": "300000000"
+      },
+      {
+        "county": "Municipiul București",
+        "region": "București-Ilfov",
+        "amount": "4200000000"
+      }
+    ],
+    "estimated": true,
+    "note": "Estimare: programul de investiții publice 2026 nu are o sursă publică structurată la nivel de județ; sumele sunt aproximative."
+  }
+}

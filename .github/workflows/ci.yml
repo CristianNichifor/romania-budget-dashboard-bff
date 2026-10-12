@@ -2,9 +2,12 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [dev, main]
     tags: ["v*"]
   pull_request:
+
+permissions:
+  contents: read
 
 jobs:
   check:
@@ -39,7 +42,19 @@ jobs:
         with:
           context: .
           push: false
-          tags: ro-budget-dashboard-bff:ci
+          tags: romania-budget-dashboard-bff:ci
+
+  verify:
+    name: verify
+    if: ${{ always() }}
+    needs: [check, docker]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every correctness job to succeed
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: |
+          echo "$RESULTS" | jq -e 'all(.[]; .result == "success")'
 
   publish:
     name: publish image

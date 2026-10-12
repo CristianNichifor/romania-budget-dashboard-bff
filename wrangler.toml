@@ -1,5 +1,9 @@
-name = "ro-budget-dashboard-bff"
+name = "romania-budget-dashboard-bff"
 main = "worker/index.ts"
+# CN Webify Customers. CN Webify binds budget.cristian-nichifor.com/api/* with
+# Terraform, so this config declares no routes and no workers.dev address.
+account_id = "5d5a0c8a05e5d8292065cd0c0cf60291"
+workers_dev = false
 compatibility_date = "2024-09-23"
 
 # Public budget data — no secrets. Flip DATA_SOURCE to "static" to serve the
