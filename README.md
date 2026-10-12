@@ -162,7 +162,7 @@ pnpm worker:deploy   # https://budget.cristian-nichifor.com/api/...
 - API-ul răspunde la `https://budget.cristian-nichifor.com/api/...`, pe aceeași origine cu dashboard-ul: o rută Workers `budget.cristian-nichifor.com/api/*` în contul Cloudflare CN Webify Customers, legată de Terraform (`wrangler.toml` nu are `routes`). `/health/*` rămâne doar local/Docker.
 - Config în `wrangler.toml`: `DATA_SOURCE` (`hackforfacts` live / `static` demo), URL-ul și timeout-urile upstream — editabile și din dashboard-ul Cloudflare.
 - Free tier Workers: 100k invocări/zi (fiecare pagină face ~6 apeluri → ~16k pagini/zi).
-- CI: `.github/workflows/deploy-worker.yml` — deploy la push pe `main` (necesită secretele `CLOUDFLARE_API_TOKEN` — token de cont Customers, _Workers Scripts Write_ — + `CLOUDFLARE_ACCOUNT_ID`).
+- CI: `.github/workflows/deploy-cloudflare.yml` — deploy la push pe `main` și manual. Fără secrete în repo: jobul cere un token Cloudflare valabil o oră de la brokerul CN Webify (`tokens.cnwebify.com`), dovedind identitatea cu tokenul OIDC al GitHub. Contul este CN Webify Customers (`5d5a0c8a05e5d8292065cd0c0cf60291`, și în `wrangler.toml`).
 
 ## Git workflow
 
