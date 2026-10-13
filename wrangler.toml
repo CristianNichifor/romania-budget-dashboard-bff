@@ -20,3 +20,23 @@ SOE_TIMEOUT_MS = "15000"
 MACRO_TIMEOUT_MS = "15000"
 CKAN_BASE_URL = "https://data.gov.ro"
 CKAN_TIMEOUT_MS = "20000"
+
+# Protected preview of the dev branch (`wrangler deploy --env dev`). Only the CN Webify preview
+# gate reaches it, through a service binding after sign-in, at budget-dev.cristian-nichifor.com/api/*.
+# Wrangler does not inherit [vars] into an environment, so they are repeated here.
+[env.dev]
+name = "romania-budget-dashboard-bff-dev"
+workers_dev = false
+preview_urls = false
+
+[env.dev.vars]
+DATA_SOURCE = "hackforfacts"
+HACK_FOR_FACTS_BASE_URL = "https://api.transparenta.eu"
+HACK_FOR_FACTS_TIMEOUT_MS = "20000"
+HACK_FOR_FACTS_YEAR = "2024"
+DATA_SOURCE_INS = "eurostat"
+SOE_BASE_URL = "https://companiidestat.ro"
+SOE_TIMEOUT_MS = "15000"
+MACRO_TIMEOUT_MS = "15000"
+CKAN_BASE_URL = "https://data.gov.ro"
+CKAN_TIMEOUT_MS = "20000"

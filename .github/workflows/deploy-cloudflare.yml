@@ -1,11 +1,12 @@
 name: Deploy (Workers)
 
 # The CN Webify token broker issues a one-hour Cloudflare token for this exact
-# file, on main, for push and workflow_dispatch. No secret lives in the repo.
+# file, on main and dev, for push and workflow_dispatch. No secret lives in the repo.
+# main is the public API; dev is its protected preview behind the CN Webify preview gate.
 
 on:
   push:
-    branches: [main]
+    branches: [main, dev]
   workflow_dispatch:
 
 permissions:
@@ -35,4 +36,4 @@ jobs:
           echo "CLOUDFLARE_API_TOKEN=$token" >> "$GITHUB_ENV"
           echo "CLOUDFLARE_ACCOUNT_ID=5d5a0c8a05e5d8292065cd0c0cf60291" >> "$GITHUB_ENV"
       - name: Deploy to Cloudflare Workers
-        run: pnpm exec wrangler deploy
+        run: pnpm exec wrangler deploy ${{ github.ref_name == 'dev' && '--env dev' || '' }}
