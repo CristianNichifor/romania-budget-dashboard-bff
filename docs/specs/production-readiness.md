@@ -80,7 +80,7 @@ Test: `tests/integration/worker-http.test.ts`.
 
 ## Theme C — data correctness
 
-### B5 — default year is the latest complete year (`todo`)
+### B5 — default year is the latest complete year (`done`)
 
 - Given no `year` query and no `HACK_FOR_FACTS_YEAR`
 - Then budget summary/destinations/institutions use the latest complete year
@@ -90,10 +90,14 @@ Test: `tests/integration/worker-http.test.ts`.
 - Summary, institutions and comparison points carry additive `partial: boolean`,
   true for the in-progress year; `/api/budget/years` adds `defaultYear`
 
-Test: `tests/unit/budget-years.test.ts`, `tests/integration/worker-http.test.ts`,
-`tests/integration/contract.test.ts` (fixture refreshed with a pinned clock).
+Test: `tests/unit/budget-years.test.ts`, `tests/integration/worker-years.test.ts`,
+`tests/integration/adopted.test.ts`, `tests/integration/contract.test.ts`
+(fixture refreshed with a pinned clock, now also covering `/api/budget/years`).
 
-### B7 — source and licence metadata (`todo`)
+Destinations are a JSON array, so they cannot carry `partial` without breaking
+the contract; clients read it from the summary of the same year.
+
+### B7 — source and licence metadata (`done`)
 
 - Given a 200 JSON object response from a data route
 - Then it carries additive `attribution: [{ name, url, licence, licenceUrl }]`
@@ -103,6 +107,19 @@ Test: `tests/unit/budget-years.test.ts`, `tests/integration/worker-http.test.ts`
 
 Test: `tests/unit/attribution.test.ts`, `tests/integration/worker-http.test.ts`,
 `tests/integration/contract.test.ts`.
+
+Licences verified on 2026-10-14 from each publisher's terms page:
+
+| Source            | Licence                      | Terms                                                                                                     |
+| ----------------- | ---------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Eurostat          | CC BY 4.0                    | https://ec.europa.eu/eurostat/web/main/help/copyright-notice                                              |
+| ECB               | ECB statistics usage policy  | https://www.ecb.europa.eu/stats/ecb_statistics/governance_and_quality_framework/html/usage_policy.en.html |
+| MFP / data.gov.ro | OGL-ROU-1.0                  | https://data.gov.ro/base/images/logoinst/OGL-ROU-1.0.pdf                                                  |
+| companiidestat.ro | CC BY 4.0                    | https://companiidestat.ro/date/                                                                           |
+| BNR               | bnr.ro terms (`needs-human`) | https://www.bnr.ro/2281-termeni-si-conditii — page renders client-side; wording not read verbatim         |
+| transparenta.eu   | none stated (`needs-human`)  | eb-server code is Apache-2.0; no data licence found                                                       |
+
+The README attribution table is Romanian prose written by the agent: needs human review.
 
 ## Maintainer-only (workflow files; the agent cannot push them)
 
