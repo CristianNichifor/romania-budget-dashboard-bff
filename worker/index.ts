@@ -73,6 +73,18 @@ function buildSources(config: AppConfig): Sources {
   };
 }
 
+// Sources hold per-instance TTL caches; building them per request threw those
+// caches away. Keep one set per configuration for the life of the isolate.
+let memo: { key: string; sources: Sources } | undefined;
+
+function sourcesFor(config: AppConfig): Sources {
+  const key = JSON.stringify(config);
+  if (memo === undefined || memo.key !== key) {
+    memo = { key, sources: buildSources(config) };
+  }
+  return memo.sources;
+}
+
 function statusFor(error: AppError): 400 | 404 | 500 | 502 {
   if (error.code === "NOT_FOUND") {
     return 404;
@@ -95,7 +107,7 @@ const app = new Hono<{ Bindings: Env; Variables: AppVariables }>();
 app.use("/api/*", cors({ origin: "*" }), async (c, next) => {
   const config = loadConfig(c.env);
   c.set("config", config);
-  c.set("sources", buildSources(config));
+  c.set("sources", sourcesFor(config));
   await next();
 });
 
