@@ -91,7 +91,7 @@ export function buildApp({
     prefix: "/api/budget",
     dependencies: {
       source: budgetSource,
-      defaultYear: config.hackForFactsYear,
+      yearOverride: config.hackForFactsYear,
     },
   });
 

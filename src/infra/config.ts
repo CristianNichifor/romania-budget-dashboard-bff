@@ -7,7 +7,8 @@ export interface AppConfig {
   dataSource: "static" | "hackforfacts";
   hackForFactsBaseUrl: string;
   hackForFactsTimeoutMs: number;
-  hackForFactsYear: string;
+  /** Optional override; unset means the latest complete budget year. */
+  hackForFactsYear: string | undefined;
   insDataSource: "static" | "insloader" | "eurostat";
   insLoaderBaseUrl: string;
   insLoaderTimeoutMs: number;
@@ -37,7 +38,10 @@ export function loadConfig(env: Record<string, string | undefined>): AppConfig {
     hackForFactsBaseUrl:
       env.HACK_FOR_FACTS_BASE_URL ?? "https://api.transparenta.eu",
     hackForFactsTimeoutMs: Number(env.HACK_FOR_FACTS_TIMEOUT_MS ?? 20000),
-    hackForFactsYear: env.HACK_FOR_FACTS_YEAR ?? "2024",
+    hackForFactsYear:
+      env.HACK_FOR_FACTS_YEAR === undefined || env.HACK_FOR_FACTS_YEAR === ""
+        ? undefined
+        : env.HACK_FOR_FACTS_YEAR,
     insDataSource:
       env.DATA_SOURCE_INS === "insloader"
         ? "insloader"

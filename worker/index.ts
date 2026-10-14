@@ -6,6 +6,10 @@ import { notFound } from "../src/common/errors";
 import { loadConfig, type AppConfig } from "../src/infra/config";
 import { buildBudgetSource } from "../src/modules/budget/shell/repo";
 import type { BudgetDataSource } from "../src/modules/budget/core/ports";
+import {
+  defaultBudgetYear,
+  isPartialYear,
+} from "../src/modules/budget/core/years";
 import { buildContextSource } from "../src/modules/context/shell/repo";
 import type { ContextDataSource } from "../src/modules/context/core/ports";
 import { buildInsSource } from "../src/modules/ins/shell/repo";
@@ -57,6 +61,11 @@ interface AppVariables {
   config: AppConfig;
 }
 
+interface AppEnv {
+  Bindings: Env;
+  Variables: AppVariables;
+}
+
 function buildSources(config: AppConfig): Sources {
   return {
     budget: buildBudgetSource(config),
@@ -103,7 +112,7 @@ function errorReply(c: Context, error: AppError): Response {
   return c.json(error, statusFor(error) as 400 | 404 | 500 | 502);
 }
 
-const app = new Hono<{ Bindings: Env; Variables: AppVariables }>();
+const app = new Hono<AppEnv>();
 
 app.use(
   "*",
@@ -126,22 +135,38 @@ app.get("/health/live", (c) => c.json({ status: "ok" }));
 app.get("/health/ready", (c) => c.json({ status: "ready" }));
 app.get("/api/health", (c) => c.json({ status: "ready" }));
 
+function requestedYear(c: Context<AppEnv>): string {
+  return (
+    c.req.query("year") ??
+    defaultBudgetYear(
+      c.get("config").hackForFactsYear,
+      c.get("sources").budget.getYears()
+    )
+  );
+}
+
 app.get("/api/budget/years", (c) => {
-  return c.json({ years: c.get("sources").budget.getYears() });
+  const years = c.get("sources").budget.getYears();
+  return c.json({
+    years,
+    defaultYear: Number(
+      defaultBudgetYear(c.get("config").hackForFactsYear, years)
+    ),
+  });
 });
 
 app.get("/api/budget/summary", async (c) => {
-  const year = c.req.query("year") ?? c.get("config").hackForFactsYear;
-  const result = await c.get("sources").budget.getSummary(year);
+  const result = await c.get("sources").budget.getSummary(requestedYear(c));
   if (result.isErr()) {
     return errorReply(c, result.error);
   }
-  return c.json(result.value);
+  return c.json({ ...result.value, partial: isPartialYear(result.value.year) });
 });
 
 app.get("/api/budget/destinations", async (c) => {
-  const year = c.req.query("year") ?? c.get("config").hackForFactsYear;
-  const result = await c.get("sources").budget.getDestinations(year);
+  const result = await c
+    .get("sources")
+    .budget.getDestinations(requestedYear(c));
   if (result.isErr()) {
     return errorReply(c, result.error);
   }
@@ -150,7 +175,7 @@ app.get("/api/budget/destinations", async (c) => {
 
 app.get("/api/budget/institutions", async (c) => {
   const category = c.req.query("category") ?? "";
-  const year = c.req.query("year") ?? c.get("config").hackForFactsYear;
+  const year = requestedYear(c);
   const result = await c.get("sources").budget.getInstitutions(year, category);
   if (result.isErr()) {
     return errorReply(c, result.error);
@@ -158,7 +183,7 @@ app.get("/api/budget/institutions", async (c) => {
   if (result.value.institutions.length === 0) {
     return c.json(notFound(`unknown category: ${category}`), 404);
   }
-  return c.json(result.value);
+  return c.json({ ...result.value, partial: isPartialYear(Number(year)) });
 });
 
 function money(value: Decimal): string {

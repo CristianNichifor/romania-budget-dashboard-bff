@@ -2,6 +2,7 @@ import type { Decimal } from "decimal.js";
 import { err, ok, type Result } from "neverthrow";
 import type { AppError } from "../../../common/errors";
 import type { BudgetDataSource } from "../../budget/core/ports";
+import { isPartialYear } from "../../budget/core/years";
 import { buildBudgetComparison, parseComparisonYears } from "../core/parser";
 import type { AdoptedBudgetDataSource } from "../core/ports";
 
@@ -16,6 +17,8 @@ export interface ComparisonPointJson {
   } | null;
   deficitDelta: string | null;
   note: string;
+  /** True for the in-progress year, whose execution is still growing. */
+  partial: boolean;
 }
 
 function money(value: Decimal): string {
@@ -90,6 +93,7 @@ export async function compareBudgetYears(
           ? null
           : money(comparison.deficitDelta),
       note: comparison.note,
+      partial: isPartialYear(comparison.year),
     });
   }
   return ok({ points });

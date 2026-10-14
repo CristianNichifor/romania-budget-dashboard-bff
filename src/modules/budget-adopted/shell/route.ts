@@ -52,6 +52,7 @@ const ComparisonPointSchema = Type.Object({
   executed: Type.Union([ComparisonExecutedSchema, Type.Null()]),
   deficitDelta: Type.Union([Type.String(), Type.Null()]),
   note: Type.String(),
+  partial: Type.Boolean(),
 });
 
 const ComparisonResponseSchema = Type.Object({
