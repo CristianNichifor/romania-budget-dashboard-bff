@@ -8,12 +8,12 @@ compatibility_date = "2026-09-01"
 
 # Public budget data — no secrets. Flip DATA_SOURCE to "static" to serve the
 # bundled demo seeds instead of live transparenta.eu data (also editable in
-# the Cloudflare dashboard).
+# the Cloudflare dashboard). The budget year defaults to the latest complete
+# year; set HACK_FOR_FACTS_YEAR only to pin another one.
 [vars]
 DATA_SOURCE = "hackforfacts"
 HACK_FOR_FACTS_BASE_URL = "https://api.transparenta.eu"
 HACK_FOR_FACTS_TIMEOUT_MS = "20000"
-HACK_FOR_FACTS_YEAR = "2024"
 DATA_SOURCE_INS = "eurostat"
 SOE_BASE_URL = "https://companiidestat.ro"
 SOE_TIMEOUT_MS = "15000"
@@ -33,7 +33,6 @@ preview_urls = false
 DATA_SOURCE = "hackforfacts"
 HACK_FOR_FACTS_BASE_URL = "https://api.transparenta.eu"
 HACK_FOR_FACTS_TIMEOUT_MS = "20000"
-HACK_FOR_FACTS_YEAR = "2024"
 DATA_SOURCE_INS = "eurostat"
 SOE_BASE_URL = "https://companiidestat.ro"
 SOE_TIMEOUT_MS = "15000"

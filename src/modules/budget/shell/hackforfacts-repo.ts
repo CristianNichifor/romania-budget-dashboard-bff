@@ -20,8 +20,8 @@ import { availableBudgetYears, validateBudgetYear } from "../core/years";
  * - aggregatedLineItems(filter, limit, offset) -> AggregatedLineItemConnection!
  * - entityAnalytics(filter, sort, limit, offset) -> EntityAnalyticsConnection!
  *
- * The queried year comes from HACK_FOR_FACTS_YEAR (the live dataset lags the
- * demo's 2026 seed). Amounts arrive as GraphQL Float and become Decimal
+ * The route picks the year: the request's, else HACK_FOR_FACTS_YEAR, else the
+ * latest complete year. Amounts arrive as GraphQL Float and become Decimal
  * strings at this boundary — the no-floats rule applies to arithmetic.
  */
 
