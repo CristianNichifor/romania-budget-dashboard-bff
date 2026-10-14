@@ -193,7 +193,9 @@ describe("GET /api/budget/comparison input", () => {
       env
     );
     expect(response.status).toBe(400);
-    expect((await response.json()).code).toBe("INVALID_INPUT");
+    expect(((await response.json()) as { code: string }).code).toBe(
+      "INVALID_INPUT"
+    );
     expect(fetchMock).not.toHaveBeenCalled();
   });
 });

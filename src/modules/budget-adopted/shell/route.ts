@@ -4,8 +4,8 @@ import type { Decimal } from "decimal.js";
 import type { AppError } from "../../../common/errors";
 import type { BudgetDataSource } from "../../budget/core/ports";
 import type { AdoptedBudgetDataSource } from "../core/ports";
-import { buildBudgetComparison } from "../core/parser";
 import { ADOPTED_SCOPE_NOTE } from "../core/types";
+import { compareBudgetYears } from "./comparison";
 
 const AdoptedFundResponseSchema = Type.Object({
   id: Type.String(),
@@ -141,61 +141,15 @@ export const budgetAdoptedRoutes: FastifyPluginAsync<{
       },
     },
     async (request, reply) => {
-      // Execution data exists from 2020 onward — older adopted years are
-      // served by /adopted but excluded from the default comparison range.
-      const comparisonYears = adoptedSource
-        .supportedYears()
-        .filter((year) => year >= 2020);
-      const yearsParam =
-        (request.query as { years?: string }).years ??
-        comparisonYears.join(",");
-
-      const points = [];
-      for (const year of yearsParam.split(",")) {
-        const adopted = await adoptedSource.getAdopted(year);
-        if (adopted.isErr()) {
-          return reply.code(statusFor(adopted.error)).send(adopted.error);
-        }
-
-        const executedResult = await budgetSource.getSummary(year);
-        // The static demo source answers every year with the 2026 seed —
-        // only accept an execution summary whose year matches the request.
-        const executed =
-          executedResult.isOk() && executedResult.value.year === Number(year)
-            ? executedResult.value
-            : null;
-
-        const comparison = buildBudgetComparison(
-          Number(year),
-          adopted.value,
-          executed
-        );
-        points.push({
-          year: comparison.year,
-          adopted: {
-            revenue: money(comparison.adopted.revenue),
-            expenditure: money(comparison.adopted.expenditure),
-            deficit: money(comparison.adopted.deficit),
-          },
-          executed:
-            comparison.executed === null
-              ? null
-              : {
-                  revenue: money(comparison.executed.revenue),
-                  expenditure: money(comparison.executed.expenditure),
-                  deficit: money(comparison.executed.deficit),
-                  deficitPercentGdp:
-                    comparison.executed.deficitPercentGdp.toFixed(1),
-                },
-          deficitDelta:
-            comparison.deficitDelta === null
-              ? null
-              : money(comparison.deficitDelta),
-          note: comparison.note,
-        });
+      const result = await compareBudgetYears(
+        adoptedSource,
+        budgetSource,
+        (request.query as { years?: string }).years
+      );
+      if (result.isErr()) {
+        return reply.code(statusFor(result.error)).send(result.error);
       }
-
-      return { points };
+      return result.value;
     }
   );
 };

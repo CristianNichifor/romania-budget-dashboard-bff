@@ -20,7 +20,7 @@ import { buildMacroSource } from "../src/modules/macro/shell/repo";
 import type { MacroDataSource } from "../src/modules/macro/core/ports";
 import { buildAdoptedSource } from "../src/modules/budget-adopted/shell/repo";
 import type { AdoptedBudgetDataSource } from "../src/modules/budget-adopted/core/ports";
-import { buildBudgetComparison } from "../src/modules/budget-adopted/core/parser";
+import { compareBudgetYears } from "../src/modules/budget-adopted/shell/comparison";
 import { ADOPTED_SCOPE_NOTE } from "../src/modules/budget-adopted/core/types";
 import { buildWageSource } from "../src/modules/wages/shell/repo";
 import type { WageDataSource } from "../src/modules/wages/core/ports";
@@ -187,62 +187,15 @@ app.get("/api/budget/adopted", async (c) => {
 
 app.get("/api/budget/comparison", async (c) => {
   const { adopted, budget } = c.get("sources");
-  const comparisonYears = adopted
-    .supportedYears()
-    .filter((year) => year >= 2020);
-  const yearsParam = c.req.query("years") ?? comparisonYears.join(",");
-  if (!/^\d{4}(,\d{4})*$/.test(yearsParam)) {
-    return c.json(
-      { code: "INVALID_INPUT", message: `invalid years: ${yearsParam}` },
-      400
-    );
+  const result = await compareBudgetYears(
+    adopted,
+    budget,
+    c.req.query("years")
+  );
+  if (result.isErr()) {
+    return errorReply(c, result.error);
   }
-
-  const points = [];
-  for (const year of yearsParam.split(",")) {
-    const adoptedResult = await adopted.getAdopted(year);
-    if (adoptedResult.isErr()) {
-      return errorReply(c, adoptedResult.error);
-    }
-    const executedResult = await budget.getSummary(year);
-    // The static demo source answers every year with the 2026 seed — only
-    // accept an execution summary whose year matches the request.
-    const executed =
-      executedResult.isOk() && executedResult.value.year === Number(year)
-        ? executedResult.value
-        : null;
-
-    const comparison = buildBudgetComparison(
-      Number(year),
-      adoptedResult.value,
-      executed
-    );
-    points.push({
-      year: comparison.year,
-      adopted: {
-        revenue: money(comparison.adopted.revenue),
-        expenditure: money(comparison.adopted.expenditure),
-        deficit: money(comparison.adopted.deficit),
-      },
-      executed:
-        comparison.executed === null
-          ? null
-          : {
-              revenue: money(comparison.executed.revenue),
-              expenditure: money(comparison.executed.expenditure),
-              deficit: money(comparison.executed.deficit),
-              deficitPercentGdp:
-                comparison.executed.deficitPercentGdp.toFixed(1),
-            },
-      deficitDelta:
-        comparison.deficitDelta === null
-          ? null
-          : money(comparison.deficitDelta),
-      note: comparison.note,
-    });
-  }
-
-  return c.json({ points });
+  return c.json(result.value);
 });
 
 app.get("/api/context/trends", async (c) => {
