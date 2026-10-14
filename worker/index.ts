@@ -122,6 +122,7 @@ app.use("/api/*", async (c, next) => {
 
 app.get("/health/live", (c) => c.json({ status: "ok" }));
 app.get("/health/ready", (c) => c.json({ status: "ready" }));
+app.get("/api/health", (c) => c.json({ status: "ready" }));
 
 app.get("/api/budget/years", (c) => {
   return c.json({ years: c.get("sources").budget.getYears() });
@@ -507,6 +508,11 @@ app.get("/api/justice/context", async (c) => {
     return errorReply(c, result.error);
   }
   return c.json(result.value);
+});
+
+app.onError((error, c) => {
+  console.error("unhandled error", error);
+  return c.json({ code: "INTERNAL", message: "internal error" }, 500);
 });
 
 app.notFound((c) => c.json({ code: "NOT_FOUND", message: "not found" }, 404));

@@ -76,6 +76,7 @@ export function buildApp({
 
   app.get("/health/live", async () => ({ status: "ok" }));
   app.get("/health/ready", async () => ({ status: "ready" }));
+  app.get("/api/health", async () => ({ status: "ready" }));
 
   const budgetSource = buildBudgetSource(config);
   const contextSource = overrides?.contextSource ?? buildContextSource(config);
