@@ -153,6 +153,7 @@ describe("GET /api/budget/comparison", () => {
     // executed deficit - adopted deficit
     expect(point.deficitDelta).toBe("149042779000");
     expect(typeof point.note).toBe("string");
+    expect(point.partial).toBe(false);
   });
 
   it("serves adopted-only points when the execution year does not match", async () => {

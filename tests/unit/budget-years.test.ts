@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   FIRST_SUPPORTED_YEAR,
   availableBudgetYears,
+  defaultBudgetYear,
+  isPartialYear,
   validateBudgetYear,
 } from "../../src/modules/budget/core/years";
 
@@ -43,5 +45,35 @@ describe("validateBudgetYear", () => {
   it("rejects future years", () => {
     const future = String(new Date().getFullYear() + 1);
     expect(validateBudgetYear(future).isErr()).toBe(true);
+  });
+});
+
+describe("isPartialYear", () => {
+  const now = new Date(2026, 9, 14);
+
+  it("flags the in-progress calendar year", () => {
+    expect(isPartialYear(2026, now)).toBe(true);
+    expect(isPartialYear(2027, now)).toBe(true);
+  });
+
+  it("treats past years as complete", () => {
+    expect(isPartialYear(2025, now)).toBe(false);
+  });
+});
+
+describe("defaultBudgetYear", () => {
+  const now = new Date(2026, 9, 14);
+  const years = [2020, 2021, 2022, 2023, 2024, 2025, 2026];
+
+  it("picks the latest complete year", () => {
+    expect(defaultBudgetYear(undefined, years, now)).toBe("2025");
+  });
+
+  it("lets an explicit override win", () => {
+    expect(defaultBudgetYear("2023", years, now)).toBe("2023");
+  });
+
+  it("falls back to the latest year when none is complete", () => {
+    expect(defaultBudgetYear(undefined, [2026], now)).toBe("2026");
   });
 });
