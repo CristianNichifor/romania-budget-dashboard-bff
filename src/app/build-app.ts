@@ -2,6 +2,7 @@ import fastify, { type FastifyInstance } from "fastify";
 import cors from "@fastify/cors";
 import rateLimit from "@fastify/rate-limit";
 import type { AppConfig } from "../infra/config";
+import { CACHEABLE, NO_STORE } from "../infra/http-cache";
 import { buildBudgetSource } from "../modules/budget/shell/repo";
 import { budgetRoutes } from "../modules/budget/shell/route";
 import { contextRoutes } from "../modules/context/shell/route";
@@ -60,6 +61,17 @@ export function buildApp({
   void app.register(rateLimit, {
     max: 200,
     timeWindow: "1 minute",
+  });
+
+  app.addHook("onSend", async (request, reply, payload) => {
+    const path = request.url.split("?")[0] ?? "";
+    const cacheable =
+      request.method === "GET" &&
+      reply.statusCode === 200 &&
+      path.startsWith("/api/") &&
+      path !== "/api/health";
+    void reply.header("Cache-Control", cacheable ? CACHEABLE : NO_STORE);
+    return payload;
   });
 
   app.get("/health/live", async () => ({ status: "ok" }));

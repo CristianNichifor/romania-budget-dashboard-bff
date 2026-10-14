@@ -1,5 +1,6 @@
 import { Hono, type Context } from "hono";
 import { cors } from "hono/cors";
+import { httpCaching } from "./http";
 import type { AppError } from "../src/common/errors";
 import { notFound } from "../src/common/errors";
 import { loadConfig, type AppConfig } from "../src/infra/config";
@@ -104,7 +105,15 @@ function errorReply(c: Context, error: AppError): Response {
 
 const app = new Hono<{ Bindings: Env; Variables: AppVariables }>();
 
-app.use("/api/*", cors({ origin: "*" }), async (c, next) => {
+app.use(
+  "*",
+  cors({
+    origin: "*",
+  }),
+  httpCaching()
+);
+
+app.use("/api/*", async (c, next) => {
   const config = loadConfig(c.env);
   c.set("config", config);
   c.set("sources", sourcesFor(config));
