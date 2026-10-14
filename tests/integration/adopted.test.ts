@@ -162,4 +162,23 @@ describe("GET /api/budget/comparison", () => {
 
     expect(response.statusCode).toBe(404);
   });
+
+  it("serves one point per distinct year", async () => {
+    const response = await (
+      await getApp()
+    ).inject({ method: "GET", url: "/api/budget/comparison?years=2020,2020" });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json().points).toHaveLength(1);
+  });
+
+  it("rejects more than ten distinct years", async () => {
+    const years = Array.from({ length: 11 }, (_, i) => 2010 + i).join(",");
+    const response = await (
+      await getApp()
+    ).inject({ method: "GET", url: `/api/budget/comparison?years=${years}` });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.json().code).toBe("INVALID_INPUT");
+  });
 });

@@ -211,3 +211,25 @@ describe("GET /api/context", () => {
     expect(response.json().code).toBe("NOT_FOUND");
   });
 });
+
+describe("Cache-Control", () => {
+  it("marks data responses as publicly cacheable", async () => {
+    const instance = await getApp();
+    const response = await instance.inject("/api/salary/calculate?gross=9427");
+
+    expect(response.statusCode).toBe(200);
+    expect(response.headers["cache-control"]).toBe(
+      "public, max-age=3600, s-maxage=21600, stale-while-revalidate=86400"
+    );
+  });
+
+  it.each(["/api/salary/calculate?gross=abc", "/health/ready"])(
+    "marks %s as no-store",
+    async (url) => {
+      const instance = await getApp();
+      const response = await instance.inject(url);
+
+      expect(response.headers["cache-control"]).toBe("no-store");
+    }
+  );
+});
