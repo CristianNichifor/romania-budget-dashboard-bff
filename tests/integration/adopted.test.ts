@@ -150,8 +150,8 @@ describe("GET /api/budget/comparison", () => {
     expect(point.executed).not.toBeNull();
     expect(point.executed.deficit).toBe("101521000000");
     expect(point.executed.deficitPercentGdp).toBe("9.5");
-    // executed deficit - adopted deficit
-    expect(point.deficitDelta).toBe("149042779000");
+    // |executed deficit| − |adopted deficit|
+    expect(point.deficitDelta).toBe("53999221000");
     expect(typeof point.note).toBe("string");
     expect(point.partial).toBe(false);
   });

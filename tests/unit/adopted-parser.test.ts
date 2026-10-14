@@ -234,7 +234,56 @@ describe("buildBudgetComparison", () => {
   it("computes the deficit delta between executed and adopted", () => {
     const comparison = buildBudgetComparison(2024, adopted, executed);
     expect(comparison.executed).not.toBeNull();
-    expect(comparison.deficitDelta?.toFixed(0)).toBe("247634246000");
+    // |152 000 000 000| − |adopted deficit|: positive means the executed
+    // deficit came out larger than the law planned.
+    expect(comparison.deficitDelta?.toFixed(0)).toBe(
+      new Decimal("152000000000").minus(adopted.deficit.abs()).toFixed(0)
+    );
+  });
+
+  it("compares deficit magnitudes across opposite sign conventions", () => {
+    // 2026: the adopted law reports revenue − expenditure (−141,9 mld lei),
+    // the execution reports expenditure − revenue (+168,4 mld lei).
+    const zero = new Decimal(0);
+    const adopted2026 = {
+      year: 2026,
+      revenue: zero,
+      expenditure: zero,
+      deficit: new Decimal("-141900000000"),
+      funds: [],
+      warnings: [],
+    };
+    const comparison = buildBudgetComparison(2026, adopted2026, {
+      year: 2026,
+      revenue: "0",
+      expenditure: "0",
+      deficit: "168400000000",
+      deficitPercentGdp: "0",
+    });
+    expect(comparison.deficitDelta?.toFixed(0)).toBe("26500000000");
+  });
+
+  it("gives a negative delta when execution beats the plan", () => {
+    const zero = new Decimal(0);
+    const comparison = buildBudgetComparison(
+      2026,
+      {
+        year: 2026,
+        revenue: zero,
+        expenditure: zero,
+        deficit: new Decimal("-100"),
+        funds: [],
+        warnings: [],
+      },
+      {
+        year: 2026,
+        revenue: "0",
+        expenditure: "0",
+        deficit: "80",
+        deficitPercentGdp: "0",
+      }
+    );
+    expect(comparison.deficitDelta?.toFixed(0)).toBe("-20");
   });
 
   it("marks executed as null when no execution summary is available", () => {
