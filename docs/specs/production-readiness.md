@@ -121,6 +121,27 @@ Licences verified on 2026-10-14 from each publisher's terms page:
 
 The README attribution table is Romanian prose written by the agent: needs human review.
 
+### B12 — deficit delta compares magnitudes (`done`)
+
+The adopted law reports the deficit as revenue − expenditure (negative), the
+execution as expenditure − revenue (positive); subtracting them summed the two.
+
+- Given 2026 adopted deficit −141,9 mld lei and executed deficit 168,4 mld lei
+- Then `deficitDelta` is 26,5 mld lei (|executed| − |adopted|)
+- And a negative delta means the execution came in under the planned deficit
+
+Test: `tests/unit/adopted-parser.test.ts`, `tests/integration/adopted.test.ts`.
+
+### B13 — category names keep their diacritics (`done`)
+
+- Given upstream names without diacritics ("Pensii si ajutoare pentru batrinete")
+- Then destinations and sub-destinations use the official spelling
+  ("Pensii și ajutoare pentru bătrânețe"), comma-below ș ț only
+- And unknown names pass through unchanged
+
+Test: `tests/unit/category-names.test.ts`. The map is Romanian text written by
+the agent: needs human review.
+
 ## Maintainer-only (workflow files; the agent cannot push them)
 
 - B9 — gate the Cloudflare deploy on CI: a `verify` job inside
