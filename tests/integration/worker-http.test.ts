@@ -257,3 +257,39 @@ describe("CORS", () => {
     );
   });
 });
+
+describe("attribution", () => {
+  it("adds attribution to object responses", async () => {
+    const response = await worker.request("/api/macro/inflation", {}, env);
+    const body = (await response.json()) as {
+      attribution: { name: string; licence: string | null }[];
+    };
+    expect(body.attribution.map((source) => source.name)).toEqual([
+      "Eurostat",
+      "Banca Națională a României",
+    ]);
+    expect(body.attribution[0]?.licence).toBe("CC BY 4.0");
+  });
+
+  it("sends attribution for array responses in a header", async () => {
+    const response = await worker.request(
+      "/api/budget/destinations?year=2026",
+      {},
+      env
+    );
+    expect(Array.isArray(await response.json())).toBe(true);
+    const header = response.headers.get("X-Data-Attribution");
+    expect(header).not.toBeNull();
+    expect(JSON.parse(header ?? "[]")).toHaveLength(1);
+  });
+
+  it("leaves computed responses without attribution", async () => {
+    const response = await worker.request(
+      "/api/salary/calculate?gross=9427",
+      {},
+      env
+    );
+    expect(await response.json()).not.toHaveProperty("attribution");
+    expect(response.headers.get("X-Data-Attribution")).toBeNull();
+  });
+});
