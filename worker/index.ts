@@ -1,10 +1,16 @@
 import { Hono, type Context } from "hono";
 import { cors } from "hono/cors";
+import { allowedOrigins, dataAttribution, httpCaching } from "./http";
+import { attributionFor } from "../src/common/attribution";
 import type { AppError } from "../src/common/errors";
 import { notFound } from "../src/common/errors";
 import { loadConfig, type AppConfig } from "../src/infra/config";
 import { buildBudgetSource } from "../src/modules/budget/shell/repo";
 import type { BudgetDataSource } from "../src/modules/budget/core/ports";
+import {
+  defaultBudgetYear,
+  isPartialYear,
+} from "../src/modules/budget/core/years";
 import { buildContextSource } from "../src/modules/context/shell/repo";
 import type { ContextDataSource } from "../src/modules/context/core/ports";
 import { buildInsSource } from "../src/modules/ins/shell/repo";
@@ -20,7 +26,7 @@ import { buildMacroSource } from "../src/modules/macro/shell/repo";
 import type { MacroDataSource } from "../src/modules/macro/core/ports";
 import { buildAdoptedSource } from "../src/modules/budget-adopted/shell/repo";
 import type { AdoptedBudgetDataSource } from "../src/modules/budget-adopted/core/ports";
-import { buildBudgetComparison } from "../src/modules/budget-adopted/core/parser";
+import { compareBudgetYears } from "../src/modules/budget-adopted/shell/comparison";
 import { ADOPTED_SCOPE_NOTE } from "../src/modules/budget-adopted/core/types";
 import { buildWageSource } from "../src/modules/wages/shell/repo";
 import type { WageDataSource } from "../src/modules/wages/core/ports";
@@ -56,6 +62,11 @@ interface AppVariables {
   config: AppConfig;
 }
 
+interface AppEnv {
+  Bindings: Env;
+  Variables: AppVariables;
+}
+
 function buildSources(config: AppConfig): Sources {
   return {
     budget: buildBudgetSource(config),
@@ -71,6 +82,18 @@ function buildSources(config: AppConfig): Sources {
     labour: buildLabourSource(config),
     justice: buildJusticeSource(config),
   };
+}
+
+// Sources hold per-instance TTL caches; building them per request threw those
+// caches away. Keep one set per configuration for the life of the isolate.
+let memo: { key: string; sources: Sources } | undefined;
+
+function sourcesFor(config: AppConfig): Sources {
+  const key = JSON.stringify(config);
+  if (memo === undefined || memo.key !== key) {
+    memo = { key, sources: buildSources(config) };
+  }
+  return memo.sources;
 }
 
 function statusFor(error: AppError): 400 | 404 | 500 | 502 {
@@ -90,34 +113,65 @@ function errorReply(c: Context, error: AppError): Response {
   return c.json(error, statusFor(error) as 400 | 404 | 500 | 502);
 }
 
-const app = new Hono<{ Bindings: Env; Variables: AppVariables }>();
+const app = new Hono<AppEnv>();
 
-app.use("/api/*", cors({ origin: "*" }), async (c, next) => {
-  const config = loadConfig(c.env);
-  c.set("config", config);
-  c.set("sources", buildSources(config));
-  await next();
-});
+app.use(
+  "*",
+  cors({
+    origin: (origin, c) =>
+      allowedOrigins(c.env.CORS_ORIGIN).includes(origin) ? origin : null,
+    allowMethods: ["GET", "HEAD", "OPTIONS"],
+  }),
+  httpCaching()
+);
+
+app.use(
+  "/api/*",
+  async (c, next) => {
+    const config = loadConfig(c.env);
+    c.set("config", config);
+    c.set("sources", sourcesFor(config));
+    await next();
+  },
+  dataAttribution((c) => attributionFor(c.req.path, c.get("config")))
+);
 
 app.get("/health/live", (c) => c.json({ status: "ok" }));
 app.get("/health/ready", (c) => c.json({ status: "ready" }));
+app.get("/api/health", (c) => c.json({ status: "ready" }));
+
+function requestedYear(c: Context<AppEnv>): string {
+  return (
+    c.req.query("year") ??
+    defaultBudgetYear(
+      c.get("config").hackForFactsYear,
+      c.get("sources").budget.getYears()
+    )
+  );
+}
 
 app.get("/api/budget/years", (c) => {
-  return c.json({ years: c.get("sources").budget.getYears() });
+  const years = c.get("sources").budget.getYears();
+  return c.json({
+    years,
+    defaultYear: Number(
+      defaultBudgetYear(c.get("config").hackForFactsYear, years)
+    ),
+  });
 });
 
 app.get("/api/budget/summary", async (c) => {
-  const year = c.req.query("year") ?? c.get("config").hackForFactsYear;
-  const result = await c.get("sources").budget.getSummary(year);
+  const result = await c.get("sources").budget.getSummary(requestedYear(c));
   if (result.isErr()) {
     return errorReply(c, result.error);
   }
-  return c.json(result.value);
+  return c.json({ ...result.value, partial: isPartialYear(result.value.year) });
 });
 
 app.get("/api/budget/destinations", async (c) => {
-  const year = c.req.query("year") ?? c.get("config").hackForFactsYear;
-  const result = await c.get("sources").budget.getDestinations(year);
+  const result = await c
+    .get("sources")
+    .budget.getDestinations(requestedYear(c));
   if (result.isErr()) {
     return errorReply(c, result.error);
   }
@@ -126,7 +180,7 @@ app.get("/api/budget/destinations", async (c) => {
 
 app.get("/api/budget/institutions", async (c) => {
   const category = c.req.query("category") ?? "";
-  const year = c.req.query("year") ?? c.get("config").hackForFactsYear;
+  const year = requestedYear(c);
   const result = await c.get("sources").budget.getInstitutions(year, category);
   if (result.isErr()) {
     return errorReply(c, result.error);
@@ -134,7 +188,7 @@ app.get("/api/budget/institutions", async (c) => {
   if (result.value.institutions.length === 0) {
     return c.json(notFound(`unknown category: ${category}`), 404);
   }
-  return c.json(result.value);
+  return c.json({ ...result.value, partial: isPartialYear(Number(year)) });
 });
 
 function money(value: Decimal): string {
@@ -175,62 +229,15 @@ app.get("/api/budget/adopted", async (c) => {
 
 app.get("/api/budget/comparison", async (c) => {
   const { adopted, budget } = c.get("sources");
-  const comparisonYears = adopted
-    .supportedYears()
-    .filter((year) => year >= 2020);
-  const yearsParam = c.req.query("years") ?? comparisonYears.join(",");
-  if (!/^\d{4}(,\d{4})*$/.test(yearsParam)) {
-    return c.json(
-      { code: "INVALID_INPUT", message: `invalid years: ${yearsParam}` },
-      400
-    );
+  const result = await compareBudgetYears(
+    adopted,
+    budget,
+    c.req.query("years")
+  );
+  if (result.isErr()) {
+    return errorReply(c, result.error);
   }
-
-  const points = [];
-  for (const year of yearsParam.split(",")) {
-    const adoptedResult = await adopted.getAdopted(year);
-    if (adoptedResult.isErr()) {
-      return errorReply(c, adoptedResult.error);
-    }
-    const executedResult = await budget.getSummary(year);
-    // The static demo source answers every year with the 2026 seed — only
-    // accept an execution summary whose year matches the request.
-    const executed =
-      executedResult.isOk() && executedResult.value.year === Number(year)
-        ? executedResult.value
-        : null;
-
-    const comparison = buildBudgetComparison(
-      Number(year),
-      adoptedResult.value,
-      executed
-    );
-    points.push({
-      year: comparison.year,
-      adopted: {
-        revenue: money(comparison.adopted.revenue),
-        expenditure: money(comparison.adopted.expenditure),
-        deficit: money(comparison.adopted.deficit),
-      },
-      executed:
-        comparison.executed === null
-          ? null
-          : {
-              revenue: money(comparison.executed.revenue),
-              expenditure: money(comparison.executed.expenditure),
-              deficit: money(comparison.executed.deficit),
-              deficitPercentGdp:
-                comparison.executed.deficitPercentGdp.toFixed(1),
-            },
-      deficitDelta:
-        comparison.deficitDelta === null
-          ? null
-          : money(comparison.deficitDelta),
-      note: comparison.note,
-    });
-  }
-
-  return c.json({ points });
+  return c.json(result.value);
 });
 
 app.get("/api/context/trends", async (c) => {
@@ -533,6 +540,11 @@ app.get("/api/justice/context", async (c) => {
     return errorReply(c, result.error);
   }
   return c.json(result.value);
+});
+
+app.onError((error, c) => {
+  console.error("unhandled error", error);
+  return c.json({ code: "INTERNAL", message: "internal error" }, 500);
 });
 
 app.notFound((c) => c.json({ code: "NOT_FOUND", message: "not found" }, 404));

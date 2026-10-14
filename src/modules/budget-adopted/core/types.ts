@@ -58,6 +58,11 @@ export interface BudgetComparisonPoint {
     deficit: Decimal;
     deficitPercentGdp: Decimal;
   } | null;
+  /**
+   * |executed deficit| − |adopted deficit|, in lei. The two sources use
+   * opposite sign conventions, so magnitudes are compared; positive means
+   * the executed deficit exceeded the adopted one.
+   */
   deficitDelta: Decimal | null;
   note: string;
 }

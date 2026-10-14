@@ -31,3 +31,27 @@ export function validateBudgetYear(year: string): Result<string, AppError> {
   }
   return ok(year);
 }
+
+/**
+ * The calendar year in progress (and anything later) is partial: its
+ * execution figures grow as monthly reports land.
+ */
+export function isPartialYear(year: number, now: Date = new Date()): boolean {
+  return year >= now.getFullYear();
+}
+
+/**
+ * Year served when a request names none: an explicit override, else the
+ * latest complete year the source offers, else its latest year.
+ */
+export function defaultBudgetYear(
+  override: string | undefined,
+  years: number[],
+  now: Date = new Date()
+): string {
+  if (override !== undefined) {
+    return override;
+  }
+  const complete = years.filter((year) => !isPartialYear(year, now));
+  return String(complete.at(-1) ?? years.at(-1) ?? now.getFullYear() - 1);
+}

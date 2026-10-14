@@ -1,10 +1,31 @@
 {
+  "/api/budget/years": {
+    "years": [2026],
+    "defaultYear": 2026,
+    "attribution": [
+      {
+        "name": "Demo data (romania-budget-dashboard-bff)",
+        "url": "https://github.com/CristianNichifor/romania-budget-dashboard-bff",
+        "licence": null,
+        "licenceUrl": null
+      }
+    ]
+  },
   "/api/budget/summary?year=2026": {
     "year": 2026,
     "revenue": "728990724000",
     "expenditure": "864675193000",
     "deficit": "135684469000",
-    "deficitPercentGdp": "7.1"
+    "deficitPercentGdp": "7.1",
+    "partial": true,
+    "attribution": [
+      {
+        "name": "Demo data (romania-budget-dashboard-bff)",
+        "url": "https://github.com/CristianNichifor/romania-budget-dashboard-bff",
+        "licence": null,
+        "licenceUrl": null
+      }
+    ]
   },
   "/api/budget/destinations?year=2026": [
     {
@@ -90,6 +111,15 @@
         "name": "Pensii de urmaș",
         "amount": "1885000000"
       }
+    ],
+    "partial": true,
+    "attribution": [
+      {
+        "name": "Demo data (romania-budget-dashboard-bff)",
+        "url": "https://github.com/CristianNichifor/romania-budget-dashboard-bff",
+        "licence": null,
+        "licenceUrl": null
+      }
     ]
   },
   "/api/salary/calculate?gross=9427.13": {
@@ -163,6 +193,14 @@
         "year": 2026,
         "value": 5.2
       }
+    ],
+    "attribution": [
+      {
+        "name": "Demo data (romania-budget-dashboard-bff)",
+        "url": "https://github.com/CristianNichifor/romania-budget-dashboard-bff",
+        "licence": null,
+        "licenceUrl": null
+      }
     ]
   },
   "/api/ins/catalog": {
@@ -181,6 +219,14 @@
         "code": "hospital-beds",
         "label": "Paturi de spital",
         "unit": "mii paturi"
+      }
+    ],
+    "attribution": [
+      {
+        "name": "Demo data (romania-budget-dashboard-bff)",
+        "url": "https://github.com/CristianNichifor/romania-budget-dashboard-bff",
+        "licence": null,
+        "licenceUrl": null
       }
     ]
   },
@@ -400,6 +446,14 @@
       }
     ],
     "estimated": true,
-    "note": "Estimare: programul de investiții publice 2026 nu are o sursă publică structurată la nivel de județ; sumele sunt aproximative."
+    "note": "Estimare: programul de investiții publice 2026 nu are o sursă publică structurată la nivel de județ; sumele sunt aproximative.",
+    "attribution": [
+      {
+        "name": "Demo data (romania-budget-dashboard-bff)",
+        "url": "https://github.com/CristianNichifor/romania-budget-dashboard-bff",
+        "licence": null,
+        "licenceUrl": null
+      }
+    ]
   }
 }

@@ -19,45 +19,45 @@ Aliniat cu `hack-for-facts-eb-server` / `transparenta-eu-ins-loader`:
 
 ## Endpoints
 
-| Metodă | Path                                       | Descriere                                                                                    |
-| ------ | ------------------------------------------ | -------------------------------------------------------------------------------------------- |
-| GET    | `/health/live`, `/health/ready`            | Probe                                                                                        |
-| GET    | `/api/salary/calculate?gross=9427`         | Calcul povară fiscală (CAS/CASS/impozit/CAM/TVA)                                             |
-| GET    | `/api/budget/summary`                      | Venituri / cheltuieli / deficit                                                              |
-| GET    | `/api/budget/destinations`                 | Destinații cu sub-destinații (drill-down)                                                    |
-| GET    | `/api/budget/institutions?category=pensii` | Detaliu categorie                                                                            |
-| GET    | `/api/context/trends?metric=health-budget` | Cheltuieli publice pentru sănătate, mil. EUR (Eurostat COFOG, live)                          |
-| GET    | `/api/ins/metrics?code=infant-mortality`   | Indicatori sociali (mortalitate infantilă, speranța de viață, paturi, beneficiari de pensii) |
-| GET    | `/api/ins/catalog`                         | Catalogul indicatorilor sociali disponibili (P7)                                             |
-| GET    | `/api/investments/by-county`               | Investiții publice pe județe (estimare 2026, marcată `estimated`)                            |
-| GET    | `/api/soe/summary`                         | Companii de stat: statistici, topuri, emblematice                                            |
-| GET    | `/api/soe/sector-trend`                    | Ponderea companiilor pe pierdere, 6 sectoare × 2019–2024                                     |
-| GET    | `/api/soe/by-county`                       | Companii de stat pe județe (CA, profit, pierderi)                                            |
-| GET    | `/api/soe/scatter`                         | Salariu vs. marjă netă per companie                                                          |
-| GET    | `/api/soe/companies/:cui`                  | Fișa unei companii (finanțe, salarii, MFin, subvenții)                                       |
-| GET    | `/api/soe/subsidies?year=2024\|2025`       | Subvenții locale către companiile de stat                                                    |
-| GET    | `/api/soe/listed`                          | Companiile de stat listate la BVB                                                            |
-| GET    | `/api/macro/inflation`                     | Inflația anuală IAPC (Eurostat) + ținta BNR                                                  |
-| GET    | `/api/macro/unemployment`                  | Rata șomajului BIM, ajustată sezonier (Eurostat)                                             |
-| GET    | `/api/macro/fx`                            | Cursul EUR/RON zilnic (BCE)                                                                  |
-| GET    | `/api/macro/deficit`                       | Deficitul trimestrial % PIB (Eurostat GFS, `gov_10q_ggnfa`)                                  |
-| GET    | `/api/macro/employment`                    | Rata de ocupare 20–64, ajustată sezonier (Eurostat)                                          |
-| GET    | `/api/macro/current-account`               | Contul curent trimestrial, mil. EUR (Eurostat BPM6)                                          |
-| GET    | `/api/macro/rates`                         | Dobânda BCE la facilitatea de depozit (punctele de schimbare)                                |
-| GET    | `/api/macro/gdp-regions`                   | PIB pe locuitor pe cele 8 regiuni de dezvoltare (indice UE27=100)                            |
-| GET    | `/api/budget/adopted?year=2024`            | Buget adoptat (legea bugetului, MFP via data.gov.ro): BS + BASS + BSAN + BSOM                |
-| GET    | `/api/budget/comparison?years=2020,…,2025` | Adoptat vs. execuție pe ani, cu delta deficitului                                            |
-| GET    | `/api/wages/context`                       | Context salarial: indicele costului muncii (LCI) + ancore SES (la 4 ani)                     |
-| GET    | `/api/wages/monthly`                       | Salariul mediu brut lunar (estimare): nivel SES ajustat cu LCI, marcat ca estimat            |
-| GET    | `/api/wages/real`                          | Salariul real: câștigul estimat deflatat cu indicele HICP (2015=100)                         |
-| GET    | `/api/society/population`                  | Populația rezidentă anuală (Eurostat)                                                        |
-| GET    | `/api/society/spending`                    | Cheltuieli publice sănătate/educație, % PIB (COFOG)                                          |
-| GET    | `/api/society/education`                   | Părăsirea timpurie a școlii + studii terțiare (Eurostat)                                     |
-| GET    | `/api/society/health`                      | Medici practicanți (număr, Eurostat)                                                         |
-| GET    | `/api/society/demographics`                | Vârsta mediană + migrația netă (Eurostat)                                                    |
-| GET    | `/api/energy/context`                      | Preț electricitate gospodării, energie regenerabilă, dependență de import                    |
-| GET    | `/api/labour/context`                      | Rata NEET, șomajul tinerilor, rata locurilor vacante (Eurostat)                              |
-| GET    | `/api/justice/context`                     | Omucideri intenționate, populație carcerală, efectiv polițiști (Eurostat)                    |
+| Metodă | Path                                           | Descriere                                                                                    |
+| ------ | ---------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| GET    | `/health/live`, `/health/ready`, `/api/health` | Probe                                                                                        |
+| GET    | `/api/salary/calculate?gross=9427`             | Calcul povară fiscală (CAS/CASS/impozit/CAM/TVA)                                             |
+| GET    | `/api/budget/summary`                          | Venituri / cheltuieli / deficit                                                              |
+| GET    | `/api/budget/destinations`                     | Destinații cu sub-destinații (drill-down)                                                    |
+| GET    | `/api/budget/institutions?category=pensii`     | Detaliu categorie                                                                            |
+| GET    | `/api/context/trends?metric=health-budget`     | Cheltuieli publice pentru sănătate, mil. EUR (Eurostat COFOG, live)                          |
+| GET    | `/api/ins/metrics?code=infant-mortality`       | Indicatori sociali (mortalitate infantilă, speranța de viață, paturi, beneficiari de pensii) |
+| GET    | `/api/ins/catalog`                             | Catalogul indicatorilor sociali disponibili (P7)                                             |
+| GET    | `/api/investments/by-county`                   | Investiții publice pe județe (estimare 2026, marcată `estimated`)                            |
+| GET    | `/api/soe/summary`                             | Companii de stat: statistici, topuri, emblematice                                            |
+| GET    | `/api/soe/sector-trend`                        | Ponderea companiilor pe pierdere, 6 sectoare × 2019–2024                                     |
+| GET    | `/api/soe/by-county`                           | Companii de stat pe județe (CA, profit, pierderi)                                            |
+| GET    | `/api/soe/scatter`                             | Salariu vs. marjă netă per companie                                                          |
+| GET    | `/api/soe/companies/:cui`                      | Fișa unei companii (finanțe, salarii, MFin, subvenții)                                       |
+| GET    | `/api/soe/subsidies?year=2024\|2025`           | Subvenții locale către companiile de stat                                                    |
+| GET    | `/api/soe/listed`                              | Companiile de stat listate la BVB                                                            |
+| GET    | `/api/macro/inflation`                         | Inflația anuală IAPC (Eurostat) + ținta BNR                                                  |
+| GET    | `/api/macro/unemployment`                      | Rata șomajului BIM, ajustată sezonier (Eurostat)                                             |
+| GET    | `/api/macro/fx`                                | Cursul EUR/RON zilnic (BCE)                                                                  |
+| GET    | `/api/macro/deficit`                           | Deficitul trimestrial % PIB (Eurostat GFS, `gov_10q_ggnfa`)                                  |
+| GET    | `/api/macro/employment`                        | Rata de ocupare 20–64, ajustată sezonier (Eurostat)                                          |
+| GET    | `/api/macro/current-account`                   | Contul curent trimestrial, mil. EUR (Eurostat BPM6)                                          |
+| GET    | `/api/macro/rates`                             | Dobânda BCE la facilitatea de depozit (punctele de schimbare)                                |
+| GET    | `/api/macro/gdp-regions`                       | PIB pe locuitor pe cele 8 regiuni de dezvoltare (indice UE27=100)                            |
+| GET    | `/api/budget/adopted?year=2024`                | Buget adoptat (legea bugetului, MFP via data.gov.ro): BS + BASS + BSAN + BSOM                |
+| GET    | `/api/budget/comparison?years=2020,…,2025`     | Adoptat vs. execuție pe ani, cu delta deficitului                                            |
+| GET    | `/api/wages/context`                           | Context salarial: indicele costului muncii (LCI) + ancore SES (la 4 ani)                     |
+| GET    | `/api/wages/monthly`                           | Salariul mediu brut lunar (estimare): nivel SES ajustat cu LCI, marcat ca estimat            |
+| GET    | `/api/wages/real`                              | Salariul real: câștigul estimat deflatat cu indicele HICP (2015=100)                         |
+| GET    | `/api/society/population`                      | Populația rezidentă anuală (Eurostat)                                                        |
+| GET    | `/api/society/spending`                        | Cheltuieli publice sănătate/educație, % PIB (COFOG)                                          |
+| GET    | `/api/society/education`                       | Părăsirea timpurie a școlii + studii terțiare (Eurostat)                                     |
+| GET    | `/api/society/health`                          | Medici practicanți (număr, Eurostat)                                                         |
+| GET    | `/api/society/demographics`                    | Vârsta mediană + migrația netă (Eurostat)                                                    |
+| GET    | `/api/energy/context`                          | Preț electricitate gospodării, energie regenerabilă, dependență de import                    |
+| GET    | `/api/labour/context`                          | Rata NEET, șomajul tinerilor, rata locurilor vacante (Eurostat)                              |
+| GET    | `/api/justice/context`                         | Omucideri intenționate, populație carcerală, efectiv polițiști (Eurostat)                    |
 
 Coduri de eroare: `400 INVALID_INPUT`, `404 NOT_FOUND`, `502 UPSTREAM_UNAVAILABLE`, `500 INTERNAL`.
 
@@ -108,10 +108,23 @@ Reguli:
 | Sursă               | Status    | Note                                                                                                                                                                                                                                                                                                                                                    |
 | ------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `static` (implicit) | P2 ✓      | Seed-uri demo identice cu cele din frontend                                                                                                                                                                                                                                                                                                             |
-| `hackforfacts`      | P8 ✓      | Client GraphQL cu mapare verificată pe schema upstream: `executionAnalytics` (sumar), `aggregatedLineItems` (destinații), `entityAnalytics` (instituții). Anul se setează prin `HACK_FOR_FACTS_YEAR`.                                                                                                                                                   |
+| `hackforfacts`      | P8 ✓      | Client GraphQL cu mapare verificată pe schema upstream: `executionAnalytics` (sumar), `aggregatedLineItems` (destinații), `entityAnalytics` (instituții). Anul implicit este ultimul an încheiat; `HACK_FOR_FACTS_YEAR` îl poate fixa.                                                                                                                  |
 | MFP / data.gov.ro   | P9 ✓      | Buget adoptat: CKAN `package_show` pe dataseturile „Bugetul de stat - {an}” (2014–2025), parcare tolerantă a XML-urilor anexa 1 (BS, BASS, BSAN, BSOM), cache 24h.                                                                                                                                                                                      |
 | Eurostat / BCE      | P11/P12 ✓ | Macro extins: deficit trimestrial GFS, ocupare, cont curent, dobânda BCE. Module: `wages` (LCI + SES + salariu real), `society` (populație + COFOG), `context` (trend sănătate COFOG), `energy`, `labour` (NEET, șomaj tineri, locuri vacante) și `justice` (omucideri, penitenciar, polițiști) — aceleași tipare de cache, fiecare cu `sourceUpdated`. |
 | INS / Eurostat      | P17 ✓     | Indicatori sociali live din Eurostat (`DATA_SOURCE_INS=eurostat`): mortalitate infantilă, speranța de viață, paturi de spital, beneficiari de pensii (`spr_pns_ben`). INS Tempo nu are API public curat — Eurostat e echivalentul onest. `static` rămâne fallback.                                                                                      |
+
+### Atribuire
+
+Fiecare răspuns JSON de tip obiect include `attribution: [{ name, url, licence, licenceUrl }]`; răspunsurile de tip listă trimit aceeași informație în antetul `X-Data-Attribution`. Licențele de mai jos sunt citite din termenii fiecărei surse.
+
+| Sursă                                          | Folosită pentru                                                         | Licență / termeni                                                                                                                                                                                     |
+| ---------------------------------------------- | ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Eurostat](https://ec.europa.eu/eurostat)      | macro, wages, society, energy, labour, justice, context, INS (Eurostat) | [CC BY 4.0](https://ec.europa.eu/eurostat/web/main/help/copyright-notice) (Decizia Comisiei 2011/833/UE); se citează sursa                                                                            |
+| [BCE](https://data.ecb.europa.eu)              | curs EUR/RON, dobânda la facilitatea de depozit                         | [Politica de utilizare a statisticilor BCE](https://www.ecb.europa.eu/stats/ecb_statistics/governance_and_quality_framework/html/usage_policy.en.html): reutilizare liberă, „Source: ECB statistics.” |
+| [BNR](https://www.bnr.ro)                      | ținta de inflație 2,5% (o constantă)                                    | [Termeni și condiții bnr.ro](https://www.bnr.ro/2281-termeni-si-conditii)                                                                                                                             |
+| [MFP / data.gov.ro](https://data.gov.ro)       | buget adoptat, comparația adoptat–executat                              | [OGL-ROU-1.0](https://data.gov.ro/base/images/logoinst/OGL-ROU-1.0.pdf)                                                                                                                               |
+| [transparenta.eu](https://transparenta.eu)     | execuție bugetară (`DATA_SOURCE=hackforfacts`)                          | Nicio licență declarată pentru date (codul eb-server e Apache-2.0)                                                                                                                                    |
+| [companiidestat.ro](https://companiidestat.ro) | companii de stat                                                        | [CC BY 4.0](https://companiidestat.ro/date/), cu atribuire către companiidestat.ro                                                                                                                    |
 
 ### Date reale: API-ul public transparenta.eu
 
@@ -124,7 +137,7 @@ Caveat-uri constatate pe instanța live:
 - **Totalurile rămân „brute”, nu consolidate**: execuțiile la nivel de ordonator principal includ transferurile intra-bugetare, deci cheltuielile (~878 mld) și veniturile (~722 mld) ies peste execuția consolidată oficială (~752 / ~575 mld); deficitul și %PIB coincid fiindcă transferurile se anulează.
 - Introspectarea GraphQL este dezactivată (maparea e verificată pe schema din repo + smoke test); unele valori ale enum-ului `ReportType` din repo dau eroare pe instanța live — live-ul pare în urma repo-ului.
 - Latenta e de ordinul secundelor la prima cerere → `HACK_FOR_FACTS_TIMEOUT_MS` implicit 20000.
-- Datele acoperă până la ~2024; nume fără diacritice în unele câmpuri.
+- Datele acoperă și 2025; anul în curs e marcat `partial: true`. Unele câmpuri au nume fără diacritice.
 
 ## Companii de stat (companiidestat.ro)
 

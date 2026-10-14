@@ -2,6 +2,12 @@ import fastify, { type FastifyInstance } from "fastify";
 import cors from "@fastify/cors";
 import rateLimit from "@fastify/rate-limit";
 import type { AppConfig } from "../infra/config";
+import {
+  attributionFor,
+  attributionHeader,
+  withAttribution,
+} from "../common/attribution";
+import { CACHEABLE, NO_STORE } from "../infra/http-cache";
 import { buildBudgetSource } from "../modules/budget/shell/repo";
 import { budgetRoutes } from "../modules/budget/shell/route";
 import { contextRoutes } from "../modules/context/shell/route";
@@ -62,8 +68,30 @@ export function buildApp({
     timeWindow: "1 minute",
   });
 
+  app.addHook("onSend", async (request, reply, payload) => {
+    const path = request.url.split("?")[0] ?? "";
+    const sources =
+      reply.statusCode === 200 ? attributionFor(path, config) : [];
+    if (sources.length > 0 && typeof payload === "string") {
+      const body: unknown = JSON.parse(payload);
+      if (Array.isArray(body)) {
+        void reply.header("X-Data-Attribution", attributionHeader(sources));
+      } else {
+        payload = JSON.stringify(withAttribution(body, sources));
+      }
+    }
+    const cacheable =
+      request.method === "GET" &&
+      reply.statusCode === 200 &&
+      path.startsWith("/api/") &&
+      path !== "/api/health";
+    void reply.header("Cache-Control", cacheable ? CACHEABLE : NO_STORE);
+    return payload;
+  });
+
   app.get("/health/live", async () => ({ status: "ok" }));
   app.get("/health/ready", async () => ({ status: "ready" }));
+  app.get("/api/health", async () => ({ status: "ready" }));
 
   const budgetSource = buildBudgetSource(config);
   const contextSource = overrides?.contextSource ?? buildContextSource(config);
@@ -78,7 +106,7 @@ export function buildApp({
     prefix: "/api/budget",
     dependencies: {
       source: budgetSource,
-      defaultYear: config.hackForFactsYear,
+      yearOverride: config.hackForFactsYear,
     },
   });
 
