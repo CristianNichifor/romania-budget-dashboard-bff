@@ -7,6 +7,7 @@ import type {
   BudgetSubDestination,
   BudgetSummary,
 } from "../../../common/types";
+import { normalizeCategoryName } from "./category-names";
 import type { BudgetInstitutions } from "./ports";
 
 /**
@@ -128,14 +129,14 @@ export function buildDestinations(
 
   for (const node of nodes) {
     const group = groups.get(node.functional_code) ?? {
-      name: node.functional_name,
+      name: normalizeCategoryName(node.functional_name),
       amount: new Decimal(0),
       subs: [],
     };
     group.amount = group.amount.plus(node.amount);
     group.subs.push({
       id: `${node.functional_code}:${node.economic_code}`,
-      name: node.economic_name,
+      name: normalizeCategoryName(node.economic_name),
       amount: new Decimal(node.amount).toString(),
     });
     groups.set(node.functional_code, group);

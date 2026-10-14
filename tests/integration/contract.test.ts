@@ -13,11 +13,15 @@ const app = buildApp({ config: loadConfig(env) });
 const fetchSpy = vi.fn(() => {
   throw new Error("Unexpected upstream request");
 });
+// Keep in step with FIXTURE_NOW in scripts/export-contract-fixtures.ts.
+const FIXTURE_NOW = new Date("2026-10-14T12:00:00Z");
 beforeAll(() => {
   vi.stubGlobal("fetch", fetchSpy);
+  vi.useFakeTimers({ toFake: ["Date"], now: FIXTURE_NOW });
 });
 afterAll(async () => {
   await app.close();
+  vi.useRealTimers();
   vi.unstubAllGlobals();
 });
 

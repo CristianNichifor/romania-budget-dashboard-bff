@@ -1,7 +1,7 @@
 import { Decimal } from "decimal.js";
 import { err, ok, type Result } from "neverthrow";
 import type { AppError } from "../../../common/errors";
-import { upstreamUnavailable } from "../../../common/errors";
+import { invalidInput, upstreamUnavailable } from "../../../common/errors";
 import type { BudgetSummary } from "../../../common/types";
 import {
   COMPARISON_SCOPE_NOTE,
@@ -237,10 +237,38 @@ export function buildBudgetComparison(
     year,
     adopted: adoptedSide,
     executed: executedSide,
+    // The adopted law reports the deficit as revenue − expenditure (negative)
+    // and the execution as expenditure − revenue (positive). Compare
+    // magnitudes: |executed| − |adopted|, positive when the executed deficit
+    // exceeds the planned one.
     deficitDelta:
       executedSide === null
         ? null
-        : executedSide.deficit.minus(adopted.deficit),
+        : executedSide.deficit.abs().minus(adopted.deficit.abs()),
     note: COMPARISON_SCOPE_NOTE,
   };
+}
+
+/** Upper bound on distinct years one comparison request may ask for. */
+export const MAX_COMPARISON_YEARS = 10;
+
+/**
+ * Validates a `years=2020,2021` query: distinct years in ascending order,
+ * at most {@link MAX_COMPARISON_YEARS} of them.
+ */
+export function parseComparisonYears(
+  param: string
+): Result<number[], AppError> {
+  if (!/^\d{4}(,\d{4})*$/.test(param)) {
+    return err(invalidInput(`invalid years: ${param}`));
+  }
+  const years = [...new Set(param.split(",").map(Number))].sort(
+    (a, b) => a - b
+  );
+  if (years.length > MAX_COMPARISON_YEARS) {
+    return err(
+      invalidInput(`at most ${MAX_COMPARISON_YEARS} years per comparison`)
+    );
+  }
+  return ok(years);
 }

@@ -150,9 +150,10 @@ describe("GET /api/budget/comparison", () => {
     expect(point.executed).not.toBeNull();
     expect(point.executed.deficit).toBe("101521000000");
     expect(point.executed.deficitPercentGdp).toBe("9.5");
-    // executed deficit - adopted deficit
-    expect(point.deficitDelta).toBe("149042779000");
+    // |executed deficit| − |adopted deficit|
+    expect(point.deficitDelta).toBe("53999221000");
     expect(typeof point.note).toBe("string");
+    expect(point.partial).toBe(false);
   });
 
   it("serves adopted-only points when the execution year does not match", async () => {
@@ -161,5 +162,24 @@ describe("GET /api/budget/comparison", () => {
     ).inject({ method: "GET", url: "/api/budget/comparison?years=2020,2021" });
 
     expect(response.statusCode).toBe(404);
+  });
+
+  it("serves one point per distinct year", async () => {
+    const response = await (
+      await getApp()
+    ).inject({ method: "GET", url: "/api/budget/comparison?years=2020,2020" });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json().points).toHaveLength(1);
+  });
+
+  it("rejects more than ten distinct years", async () => {
+    const years = Array.from({ length: 11 }, (_, i) => 2010 + i).join(",");
+    const response = await (
+      await getApp()
+    ).inject({ method: "GET", url: `/api/budget/comparison?years=${years}` });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.json().code).toBe("INVALID_INPUT");
   });
 });

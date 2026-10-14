@@ -3,6 +3,7 @@ import type { FastifyPluginAsync } from "fastify";
 import { notFound } from "../../../common/errors";
 import type { AppError } from "../../../common/errors";
 import type { BudgetDataSource } from "../core/ports";
+import { defaultBudgetYear, isPartialYear } from "../core/years";
 
 const BudgetSummaryResponseSchema = Type.Object({
   year: Type.Integer(),
@@ -10,6 +11,7 @@ const BudgetSummaryResponseSchema = Type.Object({
   expenditure: Type.String(),
   deficit: Type.String(),
   deficitPercentGdp: Type.String(),
+  partial: Type.Boolean(),
 });
 
 const BudgetSubDestinationSchema = Type.Object({
@@ -41,10 +43,12 @@ const InstitutionsResponseSchema = Type.Object({
   category: Type.String(),
   total: Type.String(),
   institutions: Type.Array(BudgetSubDestinationSchema),
+  partial: Type.Boolean(),
 });
 
 const YearsResponseSchema = Type.Object({
   years: Type.Array(Type.Integer()),
+  defaultYear: Type.Integer(),
 });
 
 const ErrorResponseSchema = Type.Object({
@@ -61,7 +65,8 @@ const ErrorResponses = {
 
 interface BudgetRouteDependencies {
   source: BudgetDataSource;
-  defaultYear: string;
+  /** Year override (HACK_FOR_FACTS_YEAR); unset means latest complete year. */
+  yearOverride: string | undefined;
 }
 
 function statusFor(error: AppError): 400 | 404 | 500 | 502 {
@@ -80,7 +85,10 @@ function statusFor(error: AppError): 400 | 404 | 500 | 502 {
 export const budgetRoutes: FastifyPluginAsync<{
   dependencies: BudgetRouteDependencies;
 }> = async (app, options) => {
-  const { source, defaultYear } = options.dependencies;
+  const { source, yearOverride } = options.dependencies;
+  const yearOf = (request: { query: unknown }): string =>
+    (request.query as { year?: string }).year ??
+    defaultBudgetYear(yearOverride, source.getYears());
 
   app.get(
     "/years",
@@ -90,7 +98,11 @@ export const budgetRoutes: FastifyPluginAsync<{
       },
     },
     async (_request, reply) => {
-      return reply.send({ years: source.getYears() });
+      const years = source.getYears();
+      return reply.send({
+        years,
+        defaultYear: Number(defaultBudgetYear(yearOverride, years)),
+      });
     }
   );
 
@@ -103,12 +115,11 @@ export const budgetRoutes: FastifyPluginAsync<{
       },
     },
     async (request, reply) => {
-      const year = (request.query as { year?: string }).year ?? defaultYear;
-      const result = await source.getSummary(year);
+      const result = await source.getSummary(yearOf(request));
       if (result.isErr()) {
         return reply.code(statusFor(result.error)).send(result.error);
       }
-      return result.value;
+      return { ...result.value, partial: isPartialYear(result.value.year) };
     }
   );
 
@@ -124,8 +135,7 @@ export const budgetRoutes: FastifyPluginAsync<{
       },
     },
     async (request, reply) => {
-      const year = (request.query as { year?: string }).year ?? defaultYear;
-      const result = await source.getDestinations(year);
+      const result = await source.getDestinations(yearOf(request));
       if (result.isErr()) {
         return reply.code(statusFor(result.error)).send(result.error);
       }
@@ -146,7 +156,7 @@ export const budgetRoutes: FastifyPluginAsync<{
     },
     async (request, reply) => {
       const { category } = request.query as { category: string };
-      const year = (request.query as { year?: string }).year ?? defaultYear;
+      const year = yearOf(request);
       const result = await source.getInstitutions(year, category);
       if (result.isErr()) {
         return reply.code(statusFor(result.error)).send(result.error);
@@ -156,7 +166,7 @@ export const budgetRoutes: FastifyPluginAsync<{
         return reply.code(404).send(notFound(`unknown category: ${category}`));
       }
 
-      return result.value;
+      return { ...result.value, partial: isPartialYear(Number(year)) };
     }
   );
 };

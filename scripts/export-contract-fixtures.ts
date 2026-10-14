@@ -4,6 +4,7 @@ import { loadConfig } from "../src/infra/config";
 
 // DEMO NOTE: versioned static API examples shared with romania-budget-dashboard.
 const paths = [
+  "/api/budget/years",
   "/api/budget/summary?year=2026",
   "/api/budget/destinations?year=2026",
   "/api/budget/institutions?category=pensii&year=2026",
@@ -12,6 +13,19 @@ const paths = [
   "/api/ins/catalog",
   "/api/investments/by-county",
 ];
+// `partial` and the default year depend on the clock; pin it so a refresh
+// is reproducible. Keep in step with FIXTURE_NOW in contract.test.ts.
+const FIXTURE_NOW = Date.parse("2026-10-14T12:00:00Z");
+const RealDate = Date;
+globalThis.Date = class extends RealDate {
+  constructor(value?: string | number | Date) {
+    super(value ?? FIXTURE_NOW);
+  }
+  static override now(): number {
+    return FIXTURE_NOW;
+  }
+} as DateConstructor;
+
 const app = buildApp({ config: loadConfig({ NODE_ENV: "test" }) });
 // A fixture refresh must never collect live production data.
 globalThis.fetch = async () => {
