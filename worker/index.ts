@@ -1,6 +1,6 @@
 import { Hono, type Context } from "hono";
 import { cors } from "hono/cors";
-import { httpCaching } from "./http";
+import { allowedOrigins, httpCaching } from "./http";
 import type { AppError } from "../src/common/errors";
 import { notFound } from "../src/common/errors";
 import { loadConfig, type AppConfig } from "../src/infra/config";
@@ -108,7 +108,9 @@ const app = new Hono<{ Bindings: Env; Variables: AppVariables }>();
 app.use(
   "*",
   cors({
-    origin: "*",
+    origin: (origin, c) =>
+      allowedOrigins(c.env.CORS_ORIGIN).includes(origin) ? origin : null,
+    allowMethods: ["GET", "HEAD", "OPTIONS"],
   }),
   httpCaching()
 );
