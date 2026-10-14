@@ -1,6 +1,7 @@
 import { Hono, type Context } from "hono";
 import { cors } from "hono/cors";
-import { allowedOrigins, httpCaching } from "./http";
+import { allowedOrigins, dataAttribution, httpCaching } from "./http";
+import { attributionFor } from "../src/common/attribution";
 import type { AppError } from "../src/common/errors";
 import { notFound } from "../src/common/errors";
 import { loadConfig, type AppConfig } from "../src/infra/config";
@@ -124,12 +125,16 @@ app.use(
   httpCaching()
 );
 
-app.use("/api/*", async (c, next) => {
-  const config = loadConfig(c.env);
-  c.set("config", config);
-  c.set("sources", sourcesFor(config));
-  await next();
-});
+app.use(
+  "/api/*",
+  async (c, next) => {
+    const config = loadConfig(c.env);
+    c.set("config", config);
+    c.set("sources", sourcesFor(config));
+    await next();
+  },
+  dataAttribution((c) => attributionFor(c.req.path, c.get("config")))
+);
 
 app.get("/health/live", (c) => c.json({ status: "ok" }));
 app.get("/health/ready", (c) => c.json({ status: "ready" }));

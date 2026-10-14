@@ -2,6 +2,11 @@ import fastify, { type FastifyInstance } from "fastify";
 import cors from "@fastify/cors";
 import rateLimit from "@fastify/rate-limit";
 import type { AppConfig } from "../infra/config";
+import {
+  attributionFor,
+  attributionHeader,
+  withAttribution,
+} from "../common/attribution";
 import { CACHEABLE, NO_STORE } from "../infra/http-cache";
 import { buildBudgetSource } from "../modules/budget/shell/repo";
 import { budgetRoutes } from "../modules/budget/shell/route";
@@ -65,6 +70,16 @@ export function buildApp({
 
   app.addHook("onSend", async (request, reply, payload) => {
     const path = request.url.split("?")[0] ?? "";
+    const sources =
+      reply.statusCode === 200 ? attributionFor(path, config) : [];
+    if (sources.length > 0 && typeof payload === "string") {
+      const body: unknown = JSON.parse(payload);
+      if (Array.isArray(body)) {
+        void reply.header("X-Data-Attribution", attributionHeader(sources));
+      } else {
+        payload = JSON.stringify(withAttribution(body, sources));
+      }
+    }
     const cacheable =
       request.method === "GET" &&
       reply.statusCode === 200 &&

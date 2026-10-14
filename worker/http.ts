@@ -1,5 +1,10 @@
 import type { Context, MiddlewareHandler } from "hono";
 
+import {
+  attributionHeader,
+  withAttribution,
+  type Attribution,
+} from "../src/common/attribution";
 import { CACHEABLE, NO_STORE } from "../src/infra/http-cache";
 
 export const DEFAULT_ALLOWED_ORIGINS = [
@@ -86,5 +91,40 @@ export function httpCaching(): MiddlewareHandler {
         )
       );
     }
+  };
+}
+
+/**
+ * Credits the publishers behind each data response: an `attribution` field
+ * on JSON objects, the `X-Data-Attribution` header on JSON arrays.
+ */
+export function dataAttribution(
+  sourcesFor: (c: Context) => Attribution[]
+): MiddlewareHandler {
+  return async (c, next) => {
+    await next();
+    if (
+      c.res.status !== 200 ||
+      !(c.res.headers.get("Content-Type") ?? "").includes("application/json")
+    ) {
+      return;
+    }
+    const sources = sourcesFor(c);
+    if (sources.length === 0) {
+      return;
+    }
+    const body: unknown = await c.res.clone().json();
+    if (Array.isArray(body)) {
+      c.res.headers.set("X-Data-Attribution", attributionHeader(sources));
+      return;
+    }
+    const headers = new Headers(c.res.headers);
+    headers.delete("Content-Length");
+    // Clear first so Hono does not merge the stale headers back in.
+    c.res = undefined;
+    c.res = new Response(JSON.stringify(withAttribution(body, sources)), {
+      status: 200,
+      headers,
+    });
   };
 }
