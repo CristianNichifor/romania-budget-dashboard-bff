@@ -9,7 +9,7 @@ Status legend: `todo`, `done`, `blocked`, `needs-human`.
 
 ## Theme A — performance
 
-### B1 — data sources live for the isolate, not the request (`todo`)
+### B1 — data sources live for the isolate, not the request (`done`)
 
 The Worker rebuilt every data source per request, so the in-memory TTL caches
 in the Eurostat, ECB, CKAN, companiidestat and wages repositories never held a
@@ -22,7 +22,7 @@ value past one request.
 
 Test: `tests/integration/worker-cache.test.ts`.
 
-### B2 — HTTP caching (`todo`)
+### B2 — HTTP caching (`done`)
 
 - Given any successful `GET /api/*` data response
 - Then it carries `Cache-Control: public, max-age=3600, s-maxage=21600, stale-while-revalidate=86400`
@@ -37,7 +37,7 @@ Test: `tests/integration/worker-http.test.ts` (header assertions across every
 route, edge cache with a fake `caches.default`), `tests/integration/api.test.ts`
 (Fastify parity).
 
-### B3 — bounded comparison input (`todo`)
+### B3 — bounded comparison input (`done`)
 
 - Given `GET /api/budget/comparison?years=2021,2021,2020`
 - Then the response holds one point per distinct year, in ascending order
@@ -50,7 +50,7 @@ Test: `tests/unit/comparison-years.test.ts`, `tests/integration/worker-http.test
 
 ## Theme B — robustness
 
-### B4 — JSON 500 and `/api/health` (`todo`)
+### B4 — JSON 500 and `/api/health` (`done`)
 
 - Given a handler throws
 - Then the Worker answers `500 {"code":"INTERNAL","message":"internal error"}` with `no-store`
@@ -59,7 +59,7 @@ Test: `tests/unit/comparison-years.test.ts`, `tests/integration/worker-http.test
 
 Test: `tests/integration/worker-http.test.ts`.
 
-### B6 — CORS allow-list (`todo`)
+### B6 — CORS allow-list (`done`)
 
 - Given `Origin: https://budget.cristian-nichifor.com` or `https://budget-dev.cristian-nichifor.com`
 - Then `Access-Control-Allow-Origin` echoes that origin and `Vary: Origin` is set
@@ -69,11 +69,14 @@ Test: `tests/integration/worker-http.test.ts`.
 
 Test: `tests/integration/worker-http.test.ts`.
 
-### B11 — compatibility date (`todo`)
+### B11 — compatibility date (`done`)
 
 - Given `wrangler.toml` `compatibility_date` is bumped to a current date
 - Then `wrangler deploy --dry-run` bundles and the Worker serves health and
   static-data routes under `wrangler dev` (manual check, recorded in the PR)
+- Bumped to `2026-09-01`, the newest date the pinned workerd (1.20260926) accepts.
+  The Worker uses no compatibility flags; `wrangler dev` served health, static
+  and live (Eurostat, CKAN, transparenta.eu) routes.
 
 ## Theme C — data correctness
 
@@ -103,8 +106,11 @@ Test: `tests/unit/attribution.test.ts`, `tests/integration/worker-http.test.ts`,
 
 ## Maintainer-only (workflow files; the agent cannot push them)
 
-- B9 — gate the Cloudflare deploy on CI (`needs: verify` / `workflow_run`). Diff in the PR body. `needs-human`
-- B10 — daily live smoke that opens an issue on failure. Diff in the PR body. `needs-human`
+- B9 — gate the Cloudflare deploy on CI: a `verify` job inside
+  `deploy-cloudflare.yml` that the deploy `needs` (a `workflow_run` trigger would
+  change the event the token broker sees). Diff in the PR body. `needs-human`
+- B10 — daily live smoke (upstream and deployed API) that opens or updates an
+  issue on failure. Diff in the PR body. `needs-human`
 
 ## Needs human
 
