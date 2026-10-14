@@ -237,10 +237,14 @@ export function buildBudgetComparison(
     year,
     adopted: adoptedSide,
     executed: executedSide,
+    // The adopted law reports the deficit as revenue − expenditure (negative)
+    // and the execution as expenditure − revenue (positive). Compare
+    // magnitudes: |executed| − |adopted|, positive when the executed deficit
+    // exceeds the planned one.
     deficitDelta:
       executedSide === null
         ? null
-        : executedSide.deficit.minus(adopted.deficit),
+        : executedSide.deficit.abs().minus(adopted.deficit.abs()),
     note: COMPARISON_SCOPE_NOTE,
   };
 }
