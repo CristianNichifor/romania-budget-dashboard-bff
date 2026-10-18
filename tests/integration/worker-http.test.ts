@@ -86,6 +86,7 @@ describe("Cache-Control", () => {
 
   it.each([
     ["/api/salary/calculate?gross=abc", 400],
+    ["/api/salary/calculate?gross=1e10000000", 400],
     ["/api/budget/institutions?category=missing&year=2026", 404],
     ["/api/nope", 404],
     ["/health/live", 200],

@@ -3,6 +3,9 @@ import { err, ok, type Result } from "neverthrow";
 import type { AppError } from "../../../../common/errors";
 import type { SalaryBreakdown, TaxRates } from "../types";
 
+const MAX_GROSS_INPUT_LENGTH = 64;
+const MAX_GROSS = new Decimal("1e15");
+
 /**
  * Computes the personal tax burden following the Open Budget 2026 model:
  * CAS (25%) + CASS (10%) + income tax (10% of gross − CAS − CASS)
@@ -14,6 +17,13 @@ export function calculateSalaryBreakdown(
   grossInput: string,
   rates: TaxRates
 ): Result<SalaryBreakdown, AppError> {
+  if (grossInput.length > MAX_GROSS_INPUT_LENGTH) {
+    return err({
+      code: "INVALID_INPUT",
+      message: "Gross salary is out of range",
+    });
+  }
+
   let gross: Decimal;
   try {
     gross = new Decimal(grossInput);
@@ -24,7 +34,11 @@ export function calculateSalaryBreakdown(
     });
   }
 
-  if (!gross.isFinite() || gross.lessThanOrEqualTo(0)) {
+  if (
+    !gross.isFinite() ||
+    gross.lessThanOrEqualTo(0) ||
+    gross.greaterThan(MAX_GROSS)
+  ) {
     return err({
       code: "INVALID_INPUT",
       message: "Gross salary must be a positive number",
