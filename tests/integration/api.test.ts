@@ -95,6 +95,17 @@ describe("GET /api/salary/calculate", () => {
     expect(response.statusCode).toBe(400);
     expect(response.json().code).toBe("INVALID_INPUT");
   });
+
+  it("rejects an oversized gross with 400", async () => {
+    const instance = await getApp();
+    const response = await instance.inject({
+      method: "GET",
+      url: "/api/salary/calculate?gross=1e10000000",
+    });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.json().code).toBe("INVALID_INPUT");
+  });
 });
 
 describe("GET /api/budget", () => {

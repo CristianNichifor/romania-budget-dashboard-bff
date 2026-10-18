@@ -6,13 +6,25 @@ const rates = staticTaxRates.get();
 
 describe("calculateSalaryBreakdown", () => {
   it("rejects invalid inputs with INVALID_INPUT", () => {
-    for (const input of ["", "0", "-100", "abc", "Infinity"]) {
+    for (const input of [
+      "",
+      "0",
+      "-100",
+      "abc",
+      "Infinity",
+      "1e10000000",
+      "9".repeat(65),
+    ]) {
       const result = calculateSalaryBreakdown(input, rates);
       expect(result.isErr()).toBe(true);
       if (result.isErr()) {
         expect(result.error.code).toBe("INVALID_INPUT");
       }
     }
+  });
+
+  it("keeps the supported salary range inclusive", () => {
+    expect(calculateSalaryBreakdown("1e15", rates).isOk()).toBe(true);
   });
 
   it("computes CAS/CASS/income tax on the standard 2026 rates", () => {
