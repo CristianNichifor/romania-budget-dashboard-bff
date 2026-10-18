@@ -146,8 +146,26 @@ export class CkanAdoptedSource implements AdoptedBudgetDataSource {
     fund: FundId
   ): string | null {
     const pattern = FUND_URL_PATTERNS[fund];
-    const xml = resources.find((resource) => pattern.test(resource.url));
-    return xml?.url ?? null;
+    const ckanOrigin = new URL(this.baseUrl).origin;
+    for (const resource of resources) {
+      try {
+        const url = new URL(resource.url);
+        if (
+          url.protocol === "https:" &&
+          url.origin === ckanOrigin &&
+          url.username === "" &&
+          url.password === "" &&
+          url.search === "" &&
+          url.hash === "" &&
+          pattern.test(url.pathname)
+        ) {
+          return url.href;
+        }
+      } catch {
+        // Ignore malformed resource URLs from CKAN metadata.
+      }
+    }
+    return null;
   }
 
   private async getFundXml(
@@ -160,6 +178,7 @@ export class CkanAdoptedSource implements AdoptedBudgetDataSource {
         const response = await fetch(url, {
           signal: AbortSignal.timeout(this.timeoutMs),
           headers: { Accept: "application/xml,text/xml,*/*" },
+          redirect: "error",
         });
         if (!response.ok) {
           return err(
